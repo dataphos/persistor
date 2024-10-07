@@ -43,30 +43,22 @@ var (
 )
 
 func (mongoConfig *MongoConfig) Validate() error {
-	// Get the context
 	ctx := context.Background()
 
-	// Set the URI used to connect to Mongo
 	mongoClientOpts := options.Client().ApplyURI(mongoConfig.ConnectionString)
 
-	// Validate the Mongo client options
 	err := mongoClientOpts.Validate()
 	if err != nil {
-		// Wrap the static error with the connection string for context
 		return fmt.Errorf("%w: '%s'", ErrMongoConnectionStringInvalid, mongoConfig.ConnectionString)
 	}
 
-	// Connect to Mongo
 	client, err := mongo.Connect(ctx, mongoClientOpts)
 	if err != nil {
-		// Wrap the connection failure error
 		return fmt.Errorf("%w: %v", ErrMongoConnectionFailed, err)
 	}
 
-	// Verify that the client can connect to the deployment (ping MongoDB)
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		// Wrap the ping failure error
 		return fmt.Errorf("%w", ErrMongoPingFailed)
 	}
 

@@ -22,7 +22,6 @@ import (
 	"os"
 )
 
-// Define static errors
 var (
 	ErrEnvVarNotSet      = errors.New("environment variable is not set")
 	ErrEnvVarValueNotSet = errors.New("value for environment variable was not found")
@@ -34,12 +33,10 @@ var (
 func GetEnvVariable(name string) (string, error) {
 	value, ok := os.LookupEnv(name)
 	if !ok {
-		// Wrap the static error with the environment variable name
 		return "", fmt.Errorf("%w: '%s'", ErrEnvVarNotSet, name)
 	}
 
 	if value == "" {
-		// Wrap the static error with the environment variable name
 		return "", fmt.Errorf("%w: '%s'", ErrEnvVarValueNotSet, name)
 	}
 

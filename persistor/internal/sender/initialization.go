@@ -27,6 +27,8 @@ import (
 	"github.com/dataphos/persistor/internal/config"
 )
 
+var ErrSenderTypeNotRecognized = errors.New("sender type not recognized")
+
 func NewTopic(ctx context.Context, senderConfig config.SenderConfig, topicID string, batchSize, batchBytes int) (topic broker.Topic, tolerateDeadLetterErrors bool, err error) {
 	var publisher broker.Publisher
 
@@ -72,7 +74,7 @@ func NewTopic(ctx context.Context, senderConfig config.SenderConfig, topicID str
 		)
 		tolerateDeadLetterErrors = false
 	default:
-		return nil, false, fmt.Errorf("sender type %s not recognized", senderConfig.Type)
+		return nil, false, fmt.Errorf("%w: %s", ErrSenderTypeNotRecognized, senderConfig.Type)
 	}
 
 	if err != nil {

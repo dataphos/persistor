@@ -93,7 +93,7 @@ func (indexer *Indexer) TransformToIndexerData(ctx context.Context, msgs ...stre
 	// into its position in the records slice and an error if necessary.
 	_ = batchproc.Parallel(ctx, len(msgs), func(ctx context.Context, start, end int) error {
 		for i := start; i < end; i++ {
-			records[i], errors[i] = TransformMessage(msgs[i], indexer.validate)
+			records[i], errors[i] = TransformMessage(msgs[i], indexer.validate) //nolint:contextcheck // no need.
 		}
 
 		return nil

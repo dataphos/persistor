@@ -70,6 +70,7 @@ func NewServiceBusReceiver(config config.ServiceBusReceiverConfig, batchSettings
 	if err != nil {
 		return nil, fmt.Errorf("iterator initialization: %w", err)
 	}
+
 	batchReceiver := brokerutil.BatchedMessageIteratorIntoBatchedReceiver(iterator, brokerutil.IntoBatchedReceiverSettings{NumGoroutines: 1})
 
 	return batchReceiver, nil

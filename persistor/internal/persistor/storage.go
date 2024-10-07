@@ -224,7 +224,7 @@ func (storage *StorageProperties) GenerateAndValidateOptionalPrefixFromMask() (o
 	return optionalPrefix, nil
 }
 
-var ErrReadingCustomValues = errors.New("Error in reading custom values. Format of custom values should be like key1:value1,key2:value2 ")
+var ErrReadingCustomValues = errors.New("reading custom values. Format of custom values should be -> key1:value1,key2:value2 ")
 
 func ValidateCustomValues(customValues string) (map[string]string, error) {
 	customValuesMap := make(map[string]string)
