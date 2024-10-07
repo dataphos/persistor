@@ -58,7 +58,7 @@ func NewTopic(ctx context.Context, senderConfig config.SenderConfig, topicID str
 
 		var tlsConfig *tls.Config
 
-		var ErrTLSSenderConfigInitialization = errors.New("TLS sender config initialization failed")
+		ErrTLSSenderConfigInitialization := errors.New("TLS sender config initialization failed")
 
 		if tlsConfig, err = config.NewTLSConfig(senderConfig.Kafka.TLSConfig.Enabled, senderConfig.Kafka.TLSConfig.CertFile, senderConfig.Kafka.TLSConfig.KeyFile, senderConfig.Kafka.TLSConfig.CAFile); err != nil {
 			return nil, false, fmt.Errorf("%w: %v", ErrTLSSenderConfigInitialization, err)

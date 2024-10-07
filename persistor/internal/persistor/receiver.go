@@ -44,7 +44,6 @@ func NewPubSubReceiver(ctx context.Context, config config.PubSubReceiverConfig, 
 	}
 
 	rec, err := pubsub.NewReceiver(ctx, receiverConfig, receiveSettings)
-
 	if err != nil {
 		return nil, fmt.Errorf("receiver initialization: %w", err)
 	}

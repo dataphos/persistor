@@ -110,7 +110,6 @@ func SendToIndexerTopic(ctx context.Context, idxTopic broker.Topic, messages []s
 		return nil
 	})
 	err := idxTopic.BatchPublish(ctx, outbound...)
-
 	if err != nil {
 		return common.NewProcessingError(len(messages), err, common.SenderPublishError)
 	}
