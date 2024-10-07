@@ -176,12 +176,12 @@ func startServer(srv *http.Server, config ServerConfig) {
 func initiateGracefulShutdown(srv *http.Server, wg *sync.WaitGroup) {
 	log.Info("graceful shut down initiated, waiting for all goroutines to finish")
 
-	// Waiting for all jobs to be done
+	// Waiting for all jobs to be done.
 	wg.Wait()
 
 	log.Info("all goroutines finished, ready for shutdown")
 
-	// New context which gives the server 5 seconds to shut down
+	// New context which gives the server 5 seconds to shut down.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 	if err := srv.Shutdown(ctx); err != nil {

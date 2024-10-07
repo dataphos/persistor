@@ -92,6 +92,7 @@ func loadServerOptionsFromEnv() ([]ServerOption, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, log.ParsingEnvVariableFailed(tlsEnv))
 		}
+
 		serverOptions = append(serverOptions, WithTLS(tls))
 	}
 
@@ -100,6 +101,7 @@ func loadServerOptionsFromEnv() ([]ServerOption, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, log.ParsingEnvVariableFailed(readHeaderTimeoutEnv))
 		}
+
 		serverOptions = append(serverOptions, WithReadHeaderTimeout(timeout))
 	}
 
@@ -113,7 +115,9 @@ func Serve(handler *Handler, opts ...ServerOption) {
 	}
 
 	router := gin.Default()
+
 	var wg sync.WaitGroup
+
 	registerResubmitterEndpoints(handler, router, &wg)
 
 	srv := &http.Server{
@@ -126,7 +130,7 @@ func Serve(handler *Handler, opts ...ServerOption) {
 
 	log.Info("resubmitter server started")
 
-	// Wait for interrupt signal to gracefully shut down the server
+	// Wait for interrupt signal to gracefully shut down the server.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
@@ -152,12 +156,12 @@ func startServer(srv *http.Server, config ServerConfig) {
 func initiateGracefulShutdown(srv *http.Server, wg *sync.WaitGroup) {
 	log.Info("graceful shut down initiated, waiting for all goroutines to finish")
 
-	// Waiting for all jobs to be done
+	// Waiting for all jobs to be done.
 	wg.Wait()
 
 	log.Info("all goroutines finished, ready for shutdown")
 
-	// New context which gives the server 5 seconds to shut down
+	// New context which gives the server 5 seconds to shut down.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 	if err := srv.Shutdown(ctx); err != nil {

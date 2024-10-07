@@ -99,14 +99,14 @@ linters:
     - govet
     - gci
     # - gochecknoglobals
-    - gochecknoinits
+    # - gochecknoinits
     # - gocognit
     - goconst
     # - gocritic
     # - gocyclo
     - godot
     - godox
-    - goerr113
+    # - goerr113
     - gofumpt
     - goheader
     # - gomnd

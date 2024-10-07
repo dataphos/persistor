@@ -84,5 +84,6 @@ func extractBucketAndObjectFromLocationKey(locationKey string) (string, string) 
 	parameters := strings.Split(locationKey, "/")
 	bucket := parameters[2]
 	object := strings.Join(parameters[3:], "/")
+
 	return bucket, object
 }

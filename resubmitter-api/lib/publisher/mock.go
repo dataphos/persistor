@@ -37,6 +37,7 @@ func (p *MockPublisher) Topic(_ string) (Topic, error) {
 
 	mockTopic := &MockTopic{mu: &sync.Mutex{}}
 	p.MockTopics = append(p.MockTopics, mockTopic)
+
 	return mockTopic, nil
 }
 
@@ -45,6 +46,7 @@ func (s *MockTopic) Publish(_ context.Context, record *persistor.Record) error {
 	defer s.mu.Unlock()
 
 	s.PublishedRecords = append(s.PublishedRecords, *record)
+
 	return nil
 }
 

@@ -72,13 +72,17 @@ func (Serializer) Deserialize(blob []byte) ([]persistor.Record, error) {
 	}
 
 	var records []persistor.Record
+
 	for dec.HasNext() {
 		var record persistor.Record
+
 		err = dec.Decode(&record)
 		if err != nil {
 			return nil, errors.Wrap(err, "can't decode into struct")
 		}
+
 		records = append(records, record)
 	}
+
 	return records, nil
 }

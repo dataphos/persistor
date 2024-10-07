@@ -168,6 +168,7 @@ func (resubmitter *Resubmitter) convertToRecordsAndGroupByKey(blob []byte, messa
 	if !shouldDeserialize(messages) {
 		return resubmitter.convertSingle(blob, messages, messageOrderingEnabled)
 	}
+
 	return resubmitter.convertBulk(blob, messages, messageOrderingEnabled)
 }
 
@@ -175,6 +176,7 @@ func shouldDeserialize(messages []indexer.Message) bool {
 	if len(messages) == 1 && messages[0].LocationPosition == nil {
 		return false
 	}
+
 	return true
 }
 
@@ -202,6 +204,7 @@ func (resubmitter *Resubmitter) convertBulk(blob []byte, messages []indexer.Mess
 	if err != nil {
 		return nil, "", err
 	}
+
 	return processRecords(messages, records, messageOrderingEnabled), messages[0].BrokerID, nil
 }
 

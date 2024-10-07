@@ -54,7 +54,6 @@ func processRecords(messages []indexer.Message, records []persistor.Record, mess
 		} else {
 			groupedRecords[""] = append(groupedRecords[""], record)
 		}
-
 	}
 
 	return groupedRecords
@@ -66,12 +65,15 @@ func packageMetadata(message *indexer.Message) map[string]string {
 	for key, entity := range message.AdditionalMetadata {
 		metadata[key] = entity
 	}
+
 	if message.BusinessObjectKey != "" {
 		metadata[persistor.BusinessObjectKey] = message.BusinessObjectKey
 	}
+
 	if message.BusinessSourceKey != "" {
 		metadata[persistor.BusinessSourceKey] = message.BusinessSourceKey
 	}
+
 	if message.OrderingKey != "" {
 		metadata[orderingKey] = message.OrderingKey
 	}
@@ -95,15 +97,18 @@ func merge(errChannels ...<-chan PipelineError) <-chan PipelineError {
 		defer close(out)
 
 		var wg sync.WaitGroup
+
 		for _, errChan := range errChannels {
 			wg.Add(1)
 			go func(errChan <-chan PipelineError) {
 				defer wg.Done()
+
 				for err := range errChan {
 					out <- err
 				}
 			}(errChan)
 		}
+
 		wg.Wait()
 	}()
 
@@ -114,6 +119,7 @@ func min(a, b int) int {
 	if a < b {
 		return a
 	}
+
 	return b
 }
 
@@ -125,5 +131,6 @@ func readBoolEnvVariable(envKey string) bool {
 			return value
 		}
 	}
+
 	return false
 }

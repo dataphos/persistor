@@ -49,6 +49,7 @@ func FromEnv() (publisher.Publisher, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error during producer config creation")
 	}
+
 	settings, err := LoadProducerSettingsFromEnv()
 	if err != nil {
 		return nil, errors.Wrap(err, "error during producer settings creation")
@@ -77,6 +78,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 		if err != nil {
 			return kafka.ProducerConfig{}, err
 		}
+
 		if tlsEnabled {
 			tlsConfig, err = httputil.NewTLSConfigFromEnv()
 			if err != nil {
@@ -91,6 +93,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 		if err != nil {
 			return kafka.ProducerConfig{}, errors.Wrap(err, log.ParsingEnvVariableFailed(skipVerifyEnvKey))
 		}
+
 		skipVerify = skipVerifyParsed
 	}
 
@@ -100,6 +103,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 		if err != nil {
 			return kafka.ProducerConfig{}, err
 		}
+
 		if kerberosEnabled {
 			kerberosConfig, err = LoadKerberosConfigFromEnv()
 			if err != nil {
@@ -114,6 +118,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 		if err != nil {
 			return kafka.ProducerConfig{}, err
 		}
+
 		if saslEnabled {
 			SASLUsername := os.Getenv(SASLUsername)
 			if SASLUsername == "" {
@@ -137,6 +142,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 		if err != nil {
 			return kafka.ProducerConfig{}, errors.Wrap(err, log.ParsingEnvVariableFailed(disableCompressionEnvKey))
 		}
+
 		disableCompression = disableCompressionParsed
 	}
 
@@ -163,6 +169,7 @@ func LoadProducerSettingsFromEnv() (kafka.ProducerSettings, error) {
 		if err != nil {
 			return kafka.ProducerSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(publisherBatchSize))
 		}
+
 		settings.BatchSize = batchSize
 	}
 
@@ -171,6 +178,7 @@ func LoadProducerSettingsFromEnv() (kafka.ProducerSettings, error) {
 		if err != nil {
 			return kafka.ProducerSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(batchBytesEnvKey))
 		}
+
 		settings.BatchBytes = int64(batchBytes)
 	}
 
@@ -179,6 +187,7 @@ func LoadProducerSettingsFromEnv() (kafka.ProducerSettings, error) {
 		if err != nil {
 			return kafka.ProducerSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(lingerEnvKey))
 		}
+
 		settings.Linger = linger
 	}
 

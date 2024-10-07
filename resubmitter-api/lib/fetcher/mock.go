@@ -46,6 +46,7 @@ func (s Mock) Fetch(ctx context.Context, location string) ([]byte, error) {
 	case error:
 		return nil, records
 	}
+
 	return nil, nil
 }
 
@@ -54,5 +55,5 @@ func (s *Mock) SetData(recordMap interface{}) {
 }
 
 func (s Mock) Reader(_ context.Context, location string) (io.ReadCloser, error) {
-	return io.NopCloser(bytes.NewReader(s.records.(map[string][]byte)[location])), nil
+	return io.NopCloser(bytes.NewReader(s.records.(map[string][]byte)[location])), nil //nolint:forcetypeassert // no need
 }

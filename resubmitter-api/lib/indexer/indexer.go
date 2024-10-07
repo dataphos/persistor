@@ -167,6 +167,7 @@ func constructGetAllRequestBody(ids []string) (io.Reader, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "can't marshall request body")
 	}
+
 	return bytes.NewReader(body), nil
 }
 
@@ -181,6 +182,7 @@ func extractIndexerMessages(response *http.Response) ([]Message, error) {
 	}
 
 	var messages []Message
+
 	err = json.Unmarshal(body, &messages)
 	if err != nil {
 		return nil, errors.Wrap(err, "can't unmarshall response body")
@@ -252,6 +254,7 @@ func extractIndexerIntervalQueryResponse(response *http.Response) (*IntervalQuer
 	}
 
 	var message IntervalQueryResponse
+
 	err = json.Unmarshal(body, &message)
 	if err != nil {
 		return nil, errors.Wrap(err, "can't unmarshall response body")
@@ -286,7 +289,7 @@ func (indexer *indexer) GetQueried(mongoCollection string, queryBody util.QueryR
 		}
 	}()
 
-	// should probably change the method name since it now has a more general use
+	// should probably change the method name since it now has a more general use.
 	return extractIndexerIntervalQueryResponse(response)
 }
 

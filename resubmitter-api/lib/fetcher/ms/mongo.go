@@ -62,7 +62,6 @@ func New(databaseName string) (fetcher.BlobStorage, error) {
 	return &Storage{
 		client: client,
 	}, nil
-
 }
 
 func newClient(databaseName string, ctx context.Context) (*mongo.Database, error) {
@@ -122,11 +121,13 @@ type mongoReadCloser struct {
 func (rc *mongoReadCloser) Read(p []byte) (int, error) {
 	if rc.data == nil {
 		var document MongoRecord
+
 		err := rc.singleResult.Decode(&document)
 		if err != nil {
 			if errors.Is(err, mongo.ErrNoDocuments) {
 				return 0, errors.Wrap(err, "mongo document not found")
 			}
+
 			return 0, errors.Wrap(err, "error during mongo document decoding")
 		}
 
@@ -139,12 +140,14 @@ func (rc *mongoReadCloser) Read(p []byte) (int, error) {
 
 	n := copy(p, rc.data[rc.pos:])
 	rc.pos += n
+
 	return n, nil
 }
 
 func (rc *mongoReadCloser) Close() error {
 	rc.data = nil
 	rc.pos = 0
+
 	return nil
 }
 
@@ -153,5 +156,6 @@ func extractCollectionAndMsgIDFromLocationKey(locationKey string) (string, strin
 	if len(parameters) != 2 {
 		return "", "", errors.New("invalid location key: the location must be of format %collection%/%msg_id%")
 	}
+
 	return parameters[0], parameters[1], nil
 }

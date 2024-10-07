@@ -51,6 +51,7 @@ func (i *Mock) GetAll(_ string, _ []string) ([]Message, error) {
 	case error:
 		return nil, response
 	}
+
 	return nil, nil
 }
 
@@ -63,6 +64,7 @@ func (i *Mock) Get(_ string) ([]Message, error) {
 	case error:
 		return nil, response
 	}
+
 	return nil, nil
 }
 
@@ -76,6 +78,7 @@ func (i *Mock) GetAllInInterval(_ string, _ string, _, _ time.Time, limit, offse
 		if messageEnd > len(messages) {
 			messageEnd = len(messages)
 		}
+
 		messages = messages[offset:messageEnd]
 
 		i.BatchIntervals = append(i.BatchIntervals, BatchInterval{offset, messageEnd})
@@ -90,6 +93,7 @@ func (i *Mock) GetAllInInterval(_ string, _ string, _, _ time.Time, limit, offse
 	case error:
 		return nil, response
 	}
+
 	return nil, nil
 }
 
@@ -103,6 +107,7 @@ func (i *Mock) GetQueried(_ string, _ util.QueryRequestBody, limit, offset int) 
 		if messageEnd > len(messages) {
 			messageEnd = len(messages)
 		}
+
 		messages = messages[offset:messageEnd]
 
 		i.BatchIntervals = append(i.BatchIntervals, BatchInterval{offset, messageEnd})
@@ -117,5 +122,6 @@ func (i *Mock) GetQueried(_ string, _ util.QueryRequestBody, limit, offset int) 
 	case error:
 		return nil, response
 	}
+
 	return nil, nil
 }

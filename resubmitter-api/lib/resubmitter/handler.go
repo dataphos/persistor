@@ -47,6 +47,7 @@ func NewHandler(resubmitter *Resubmitter) *Handler {
 	if topicId == "" {
 		log.Warn(fmt.Sprintf("environment variable %s is not defined", TopicIdEnv))
 	}
+
 	return &Handler{
 		resubmitterJob: &resubmitterJob{resubmitter: *resubmitter},
 		envTopicId:     topicId,
@@ -70,11 +71,14 @@ func (handler *Handler) ResubmitIds(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": OnNoTopicMessage,
 		})
+
 		return
 	}
 
 	mongoCollection := c.Param("mongo_collection")
+
 	var body request
+
 	err := c.BindJSON(&body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -102,6 +106,7 @@ func (handler *Handler) getTopicIdFromQueryOrEnv(c *gin.Context) string {
 	if topicId == "" {
 		topicId = handler.envTopicId
 	}
+
 	return topicId
 }
 
@@ -127,6 +132,7 @@ func chooseResponseMessage(statusCode int) string {
 	case http.StatusInternalServerError:
 		return OnFailureMessage
 	}
+
 	return "no response message for this status code"
 }
 
@@ -142,24 +148,29 @@ func (handler *Handler) ResubmitInterval(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": OnNoTopicMessage,
 		})
+
 		return
 	}
 
 	mongoCollection := c.Param("mongo_collection")
+
 	var body intervalRequest
+
 	err := c.BindJSON(&body)
 	if err != nil {
-		err = fmt.Errorf("error occured during binding JSON to request body: %w", err)
+		err = fmt.Errorf("error occurred during binding JSON to request body: %w", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg":   OnBadRequestMessage,
 			"error": err.Error(),
 		})
+
 		return
 	}
 
 	checkIfParamsMissing(&body)
 
 	handler.resubmitterJob.resetCounters()
+
 	results := handler.resubmitterJob.ResubmitInterval(topicId, mongoCollection, body.BrokerId, *body.LowerBound, *body.UpperBound)
 
 	statusCode := chooseHTTPStatusCode(handler.resubmitterJob, results)
@@ -191,6 +202,7 @@ func (handler *Handler) ResubmitQueried(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": OnNoTopicMessage,
 		})
+
 		return
 	}
 
@@ -199,11 +211,12 @@ func (handler *Handler) ResubmitQueried(c *gin.Context) {
 	var body util.QueryRequestBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		err = fmt.Errorf("error occured during binding JSON to request body: %w", err)
+		err = fmt.Errorf("error occurred during binding JSON to request body: %w", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg":   OnBadRequestMessage,
 			"error": err.Error(),
 		})
+
 		return
 	}
 

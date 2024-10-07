@@ -108,5 +108,6 @@ func extractContainerAndBlobFromLocationKey(locationKey string) (string, string)
 	parameters := strings.Split(locationKey, "/")
 	bucket := parameters[3]
 	object := strings.Join(parameters[4:], "/")
+
 	return bucket, object
 }

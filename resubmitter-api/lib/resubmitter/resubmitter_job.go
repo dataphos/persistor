@@ -33,15 +33,15 @@ const (
 type resubmitterJob struct {
 	resubmitter Resubmitter
 
-	// number of message IDs given in the request body
+	// number of message IDs given in the request body.
 	StartingCounter int `json:"starting_count,omitempty"`
-	// number of messages found by Indexer
+	// number of messages found by Indexer.
 	IndexedCounter int `json:"indexed_count"`
-	// number of messages successfully fetched from the storage
+	// number of messages successfully fetched from the storage.
 	FetchedCounter int `json:"fetched_count"`
-	// number of successfully deserialized messages
+	// number of successfully deserialized messages.
 	DeserializedCounter int `json:"deserialized_count"`
-	// number of successfully published messages
+	// number of successfully published messages.
 	PublishedCounter int `json:"published_count"`
 
 	startingMutex     sync.Mutex
@@ -104,6 +104,7 @@ func (resubmitterJob *resubmitterJob) batchesFromIds(mongoCollection string, ids
 		if err != nil {
 			log.Debug(err.Error(), errcodes.Indexer)
 			errc <- IndexerError{Reason: err.Error()}
+
 			return
 		}
 
@@ -118,6 +119,7 @@ func (resubmitterJob *resubmitterJob) batchesFromIds(mongoCollection string, ids
 	batchSize := resubmitterJob.resubmitter.Settings.MetadataCapacity
 	fullBatches := collectionSize / batchSize
 	totalBatches := fullBatches
+
 	if len(ids)%resubmitterJob.resubmitter.Settings.MetadataCapacity != 0 {
 		totalBatches++
 	}
@@ -130,6 +132,7 @@ func (resubmitterJob *resubmitterJob) batchesFromIds(mongoCollection string, ids
 		for ; i < fullBatches; i++ {
 			generator(i*batchSize, (i+1)*batchSize)
 		}
+
 		if totalBatches != fullBatches {
 			generator(i*batchSize, collectionSize)
 		}
@@ -160,6 +163,7 @@ func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, broke
 		if err != nil {
 			log.Debug(err.Error(), errcodes.Indexer)
 			errc <- IndexerError{Reason: err.Error()}
+
 			return
 		}
 
@@ -177,6 +181,7 @@ func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, broke
 			if err != nil {
 				log.Debug(err.Error(), errcodes.Indexer)
 				errc <- IndexerError{Reason: err.Error()}
+
 				return
 			}
 
@@ -188,7 +193,6 @@ func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, broke
 
 			resubmitterJob.UpdateIndexedCounter(intervalQueryResponse.ReturnedCount)
 		}
-
 	}()
 
 	return batches, errc
@@ -214,6 +218,7 @@ func (resubmitterJob *resubmitterJob) batchesFromQuery(mongoCollection string, q
 		if err != nil {
 			log.Debug(err.Error(), errcodes.Indexer)
 			errc <- IndexerError{Reason: err.Error()}
+
 			return
 		}
 
@@ -231,6 +236,7 @@ func (resubmitterJob *resubmitterJob) batchesFromQuery(mongoCollection string, q
 			if err != nil {
 				log.Debug(err.Error(), errcodes.Indexer)
 				errc <- IndexerError{Reason: err.Error()}
+
 				return
 			}
 
@@ -250,6 +256,7 @@ func (resubmitterJob *resubmitterJob) batchesFromQuery(mongoCollection string, q
 func (resubmitterJob *resubmitterJob) run(topicId string, init source) ResubmitResult {
 	batches, indexerErrChan := init()
 	pipelineErrChan := resubmitterJob.pipeline(context.Background(), topicId, batches)
+
 	return collectErrors(indexerErrChan, pipelineErrChan)
 }
 
@@ -293,6 +300,7 @@ func (resubmitterJob *resubmitterJob) fetch(ctx context.Context, jobs <-chan fet
 		if err != nil {
 			log.Debug(err.Error(), errcodes.Fetcher)
 			tagAsFailures(messages, "storage_error", errc)
+
 			return
 		}
 
@@ -309,6 +317,7 @@ func (resubmitterJob *resubmitterJob) fetch(ctx context.Context, jobs <-chan fet
 		defer close(errc)
 
 		var wg sync.WaitGroup
+
 		for job := range jobs {
 			wg.Add(1)
 			go fetchingWorker(job.location, job.messages, &wg)
@@ -331,6 +340,7 @@ func (resubmitterJob *resubmitterJob) packaging(jobs <-chan packageJob) (<-chan 
 			if err != nil {
 				log.Debug(err.Error(), errcodes.Serializer)
 				tagAsFailures(job.messages, "deserialization_error", errc)
+
 				continue
 			}
 
@@ -342,6 +352,7 @@ func (resubmitterJob *resubmitterJob) packaging(jobs <-chan packageJob) (<-chan 
 			}
 
 			count := 0
+
 			for _, t := range records {
 				count += len(t)
 			}
@@ -356,6 +367,7 @@ func (resubmitterJob *resubmitterJob) packaging(jobs <-chan packageJob) (<-chan 
 		var wg sync.WaitGroup
 		numWorkers := min(resubmitterJob.resubmitter.Settings.NumPackagingWorkers, cap(jobs))
 		wg.Add(numWorkers)
+
 		for i := 0; i < numWorkers; i++ {
 			go packagingWorker(&wg)
 		}
@@ -397,6 +409,7 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicId strin
 			keyless := groupedRecords[""]
 
 			log.Debug(fmt.Sprintf("starting publishing %v keyless records", len(keyless)), 0)
+
 			for _, record := range keyless {
 				wg.Add(1)
 
@@ -420,13 +433,13 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicId strin
 
 				go func() {
 					defer wg.Done()
+
 					for _, record := range group {
 						record := record
 						recordPublisher(record)
 					}
 				}()
 			}
-
 			wg.Wait()
 		}
 	}()

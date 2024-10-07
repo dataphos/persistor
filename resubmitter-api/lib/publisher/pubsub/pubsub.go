@@ -74,6 +74,7 @@ func LoadPublishSettingsFromEnv() (pubsub.PublishSettings, error) {
 		if err != nil {
 			return pubsub.PublishSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(delayThresholdEnvKey))
 		}
+
 		settings.DelayThreshold = delayThreshold
 	}
 
@@ -82,6 +83,7 @@ func LoadPublishSettingsFromEnv() (pubsub.PublishSettings, error) {
 		if err != nil {
 			return pubsub.PublishSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(countThresholdEnvKey))
 		}
+
 		settings.CountThreshold = countThreshold
 	}
 
@@ -90,10 +92,12 @@ func LoadPublishSettingsFromEnv() (pubsub.PublishSettings, error) {
 		if err != nil {
 			return pubsub.PublishSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(byteThresholdEnvKey))
 		}
+
 		byteThresholdInt := int(byteThreshold)
 		if byteThresholdInt <= 0 {
 			return pubsub.PublishSettings{}, errors.New(log.ParsingEnvVariableFailed(byteThresholdEnvKey))
 		}
+
 		settings.ByteThreshold = byteThresholdInt
 	}
 
@@ -102,6 +106,7 @@ func LoadPublishSettingsFromEnv() (pubsub.PublishSettings, error) {
 		if err != nil {
 			return pubsub.PublishSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(numPublishGoroutinesEnvKey))
 		}
+
 		settings.NumGoroutines = numGoroutines
 	}
 
@@ -110,6 +115,7 @@ func LoadPublishSettingsFromEnv() (pubsub.PublishSettings, error) {
 		if err != nil {
 			return pubsub.PublishSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(timeoutEnvKey))
 		}
+
 		settings.Timeout = timeout
 	}
 
@@ -118,6 +124,7 @@ func LoadPublishSettingsFromEnv() (pubsub.PublishSettings, error) {
 		if err != nil {
 			return pubsub.PublishSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(maxPublishOutstandingMessagesEnvKey))
 		}
+
 		settings.MaxOutstandingMessages = maxOutstandingMessages
 	}
 
@@ -126,10 +133,12 @@ func LoadPublishSettingsFromEnv() (pubsub.PublishSettings, error) {
 		if err != nil {
 			return pubsub.PublishSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(maxPublishOutstandingBytesEnvKey))
 		}
+
 		maxOutstandingBytesInt := int(maxOutstandingBytes)
 		if maxOutstandingBytesInt <= 0 {
 			return pubsub.PublishSettings{}, errors.New(log.ParsingEnvVariableFailed(maxPublishOutstandingBytesEnvKey))
 		}
+
 		settings.MaxOutstandingBytes = maxOutstandingBytesInt
 	}
 
