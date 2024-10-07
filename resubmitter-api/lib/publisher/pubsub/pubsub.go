@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package pubsub contains pubsub logic for Resubmitter-API
 package pubsub
 
 import (
@@ -147,14 +148,15 @@ func LoadPublishSettingsFromEnv() (pubsub.PublishSettings, error) {
 		if err != nil {
 			return pubsub.PublishSettings{}, errors.Wrap(err, log.ParsingEnvVariableFailed(publishEnableMessageOrderingEnvKey))
 		}
+
 		settings.EnableMessageOrdering = enableMessageOrdering
 	}
 
 	return settings, nil
 }
 
-func (publisher *Publisher) Topic(topicId string) (publisher.Topic, error) {
-	topic, err := publisher.client.Topic(topicId)
+func (publisher *Publisher) Topic(topicID string) (publisher.Topic, error) {
+	topic, err := publisher.client.Topic(topicID)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating topic failed")
 	}

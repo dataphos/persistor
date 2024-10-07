@@ -89,8 +89,8 @@ func (resubmitterJob *resubmitterJob) resetCounters() {
 	resubmitterJob.PublishedCounter = 0
 }
 
-func (resubmitterJob *resubmitterJob) Resubmit(topicId, mongoCollection string, ids []string) ResubmitResult {
-	return resubmitterJob.run(topicId, func() (<-chan []indexer.Message, <-chan IndexerError) {
+func (resubmitterJob *resubmitterJob) Resubmit(topicID, mongoCollection string, ids []string) ResubmitResult {
+	return resubmitterJob.run(topicID, func() (<-chan []indexer.Message, <-chan IndexerError) {
 		return resubmitterJob.batchesFromIds(mongoCollection, ids)
 	})
 }
@@ -128,13 +128,13 @@ func (resubmitterJob *resubmitterJob) batchesFromIds(mongoCollection string, ids
 		defer close(batches)
 		defer close(errc)
 
-		var i int
-		for ; i < fullBatches; i++ {
-			generator(i*batchSize, (i+1)*batchSize)
+		var counter int
+		for ; counter < fullBatches; counter++ {
+			generator(counter*batchSize, (counter+1)*batchSize)
 		}
 
 		if totalBatches != fullBatches {
-			generator(i*batchSize, collectionSize)
+			generator(counter*batchSize, collectionSize)
 		}
 	}()
 
@@ -143,13 +143,13 @@ func (resubmitterJob *resubmitterJob) batchesFromIds(mongoCollection string, ids
 	return batches, errc
 }
 
-func (resubmitterJob *resubmitterJob) ResubmitInterval(topicId, mongoCollection, brokerId string, lb time.Time, ub time.Time) ResubmitResult {
-	return resubmitterJob.run(topicId, func() (<-chan []indexer.Message, <-chan IndexerError) {
-		return resubmitterJob.batchesFromInterval(mongoCollection, brokerId, lb, ub)
+func (resubmitterJob *resubmitterJob) ResubmitInterval(topicID, mongoCollection, brokerID string, lb time.Time, ub time.Time) ResubmitResult {
+	return resubmitterJob.run(topicID, func() (<-chan []indexer.Message, <-chan IndexerError) {
+		return resubmitterJob.batchesFromInterval(mongoCollection, brokerID, lb, ub)
 	})
 }
 
-func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, brokerId string, from, to time.Time) (<-chan []indexer.Message, <-chan IndexerError) {
+func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, brokerID string, from, to time.Time) (<-chan []indexer.Message, <-chan IndexerError) {
 	batches := make(chan []indexer.Message, 1)
 	errc := make(chan IndexerError)
 
@@ -159,7 +159,7 @@ func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, broke
 		defer close(batches)
 		defer close(errc)
 
-		intervalQueryResponse, err := resubmitterJob.resubmitter.Indexer.GetAllInInterval(mongoCollection, brokerId, from, to, batchSize, 0)
+		intervalQueryResponse, err := resubmitterJob.resubmitter.Indexer.GetAllInInterval(mongoCollection, brokerID, from, to, batchSize, 0)
 		if err != nil {
 			log.Debug(err.Error(), errcodes.Indexer)
 			errc <- IndexerError{Reason: err.Error()}
@@ -177,7 +177,7 @@ func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, broke
 		resubmitterJob.UpdateIndexedCounter(intervalQueryResponse.ReturnedCount)
 
 		for offset < collectionSize {
-			intervalQueryResponse, err = resubmitterJob.resubmitter.Indexer.GetAllInInterval(mongoCollection, brokerId, from, to, batchSize, offset)
+			intervalQueryResponse, err = resubmitterJob.resubmitter.Indexer.GetAllInInterval(mongoCollection, brokerID, from, to, batchSize, offset)
 			if err != nil {
 				log.Debug(err.Error(), errcodes.Indexer)
 				errc <- IndexerError{Reason: err.Error()}
@@ -198,8 +198,8 @@ func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, broke
 	return batches, errc
 }
 
-func (resubmitterJob *resubmitterJob) ResubmitQuery(topicId, mongoCollection string, queryBody util.QueryRequestBody) ResubmitResult {
-	return resubmitterJob.run(topicId, func() (<-chan []indexer.Message, <-chan IndexerError) {
+func (resubmitterJob *resubmitterJob) ResubmitQuery(topicID, mongoCollection string, queryBody util.QueryRequestBody) ResubmitResult {
+	return resubmitterJob.run(topicID, func() (<-chan []indexer.Message, <-chan IndexerError) {
 		return resubmitterJob.batchesFromQuery(mongoCollection, queryBody)
 	})
 }
@@ -253,18 +253,18 @@ func (resubmitterJob *resubmitterJob) batchesFromQuery(mongoCollection string, q
 	return batches, errc
 }
 
-func (resubmitterJob *resubmitterJob) run(topicId string, init source) ResubmitResult {
+func (resubmitterJob *resubmitterJob) run(topicID string, init source) ResubmitResult {
 	batches, indexerErrChan := init()
-	pipelineErrChan := resubmitterJob.pipeline(context.Background(), topicId, batches)
+	pipelineErrChan := resubmitterJob.pipeline(context.Background(), topicID, batches)
 
 	return collectErrors(indexerErrChan, pipelineErrChan)
 }
 
-func (resubmitterJob *resubmitterJob) pipeline(ctx context.Context, topicId string, batches <-chan []indexer.Message) <-chan PipelineError {
+func (resubmitterJob *resubmitterJob) pipeline(ctx context.Context, topicID string, batches <-chan []indexer.Message) <-chan PipelineError {
 	groups := resubmitterJob.groupings(batches)
 	blobs, fetchErrChan := resubmitterJob.fetch(ctx, groups)
 	records, packagingErrChan := resubmitterJob.packaging(blobs)
-	publishErrChan := resubmitterJob.publish(ctx, topicId, records)
+	publishErrChan := resubmitterJob.publish(ctx, topicID, records)
 
 	return merge(fetchErrChan, packagingErrChan, publishErrChan)
 }
@@ -293,8 +293,8 @@ func (resubmitterJob *resubmitterJob) fetch(ctx context.Context, jobs <-chan fet
 	results := make(chan packageJob, resubmitterJob.resubmitter.Settings.PipelineCapacity)
 	errc := make(chan PipelineError, 1)
 
-	fetchingWorker := func(location string, messages []indexer.Message, wg *sync.WaitGroup) {
-		defer wg.Done()
+	fetchingWorker := func(location string, messages []indexer.Message, waitGroup *sync.WaitGroup) {
+		defer waitGroup.Done()
 
 		blob, err := resubmitterJob.resubmitter.BlobFetcher.Fetch(ctx, location)
 		if err != nil {
@@ -316,13 +316,15 @@ func (resubmitterJob *resubmitterJob) fetch(ctx context.Context, jobs <-chan fet
 		defer close(results)
 		defer close(errc)
 
-		var wg sync.WaitGroup
+		var waitGroup sync.WaitGroup
 
 		for job := range jobs {
-			wg.Add(1)
-			go fetchingWorker(job.location, job.messages, &wg)
+			waitGroup.Add(1)
+
+			go fetchingWorker(job.location, job.messages, &waitGroup)
 		}
-		wg.Wait()
+
+		waitGroup.Wait()
 	}()
 
 	return results, errc
@@ -332,11 +334,11 @@ func (resubmitterJob *resubmitterJob) packaging(jobs <-chan packageJob) (<-chan 
 	results := make(chan publishJob, cap(jobs))
 	errc := make(chan PipelineError, 1)
 
-	packagingWorker := func(wg *sync.WaitGroup) {
-		defer wg.Done()
+	packagingWorker := func(waitGroup *sync.WaitGroup) {
+		defer waitGroup.Done()
 
 		for job := range jobs {
-			records, topicId, err := resubmitterJob.resubmitter.convertToRecordsAndGroupByKey(job.blob, job.messages)
+			records, topicID, err := resubmitterJob.resubmitter.convertToRecordsAndGroupByKey(job.blob, job.messages)
 			if err != nil {
 				log.Debug(err.Error(), errcodes.Serializer)
 				tagAsFailures(job.messages, "deserialization_error", errc)
@@ -347,7 +349,7 @@ func (resubmitterJob *resubmitterJob) packaging(jobs <-chan packageJob) (<-chan 
 			log.Debug(fmt.Sprintf("created %v record groups", len(records)), 0)
 
 			results <- publishJob{
-				topicId: topicId,
+				topicID: topicID,
 				records: records,
 			}
 
@@ -356,6 +358,7 @@ func (resubmitterJob *resubmitterJob) packaging(jobs <-chan packageJob) (<-chan 
 			for _, t := range records {
 				count += len(t)
 			}
+
 			resubmitterJob.UpdateDeserializedCounter(count)
 		}
 	}
@@ -364,23 +367,26 @@ func (resubmitterJob *resubmitterJob) packaging(jobs <-chan packageJob) (<-chan 
 		defer close(results)
 		defer close(errc)
 
-		var wg sync.WaitGroup
+		var waitGroup sync.WaitGroup
+
 		numWorkers := min(resubmitterJob.resubmitter.Settings.NumPackagingWorkers, cap(jobs))
-		wg.Add(numWorkers)
+
+		waitGroup.Add(numWorkers)
 
 		for i := 0; i < numWorkers; i++ {
-			go packagingWorker(&wg)
+			go packagingWorker(&waitGroup)
 		}
-		wg.Wait()
+
+		waitGroup.Wait()
 	}()
 
 	return results, errc
 }
 
-func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicId string, jobs <-chan publishJob) <-chan PipelineError {
+func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicID string, jobs <-chan publishJob) <-chan PipelineError {
 	errc := make(chan PipelineError, 1)
 
-	topic, err := resubmitterJob.resubmitter.Publisher.Topic(topicId)
+	topic, err := resubmitterJob.resubmitter.Publisher.Topic(topicID)
 	if err != nil {
 		log.Fatal(err.Error(), errcodes.Publisher)
 	}
@@ -403,7 +409,7 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicId strin
 		defer close(errc)
 
 		for job := range jobs {
-			var wg sync.WaitGroup
+			var waitGroup sync.WaitGroup
 
 			groupedRecords := job.records
 			keyless := groupedRecords[""]
@@ -411,12 +417,12 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicId strin
 			log.Debug(fmt.Sprintf("starting publishing %v keyless records", len(keyless)), 0)
 
 			for _, record := range keyless {
-				wg.Add(1)
+				waitGroup.Add(1)
 
 				record := record
 
 				go func() {
-					defer wg.Done()
+					defer waitGroup.Done()
 					recordPublisher(record)
 				}()
 			}
@@ -426,13 +432,13 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicId strin
 					continue
 				}
 
-				wg.Add(1)
+				waitGroup.Add(1)
 
 				group := group
 				log.Debug(fmt.Sprintf("starting publishing %v records with key %v", len(group), key), 0)
 
 				go func() {
-					defer wg.Done()
+					defer waitGroup.Done()
 
 					for _, record := range group {
 						record := record
@@ -440,7 +446,7 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicId strin
 					}
 				}()
 			}
-			wg.Wait()
+			waitGroup.Wait()
 		}
 	}()
 

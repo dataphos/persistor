@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package kafka contains kafka logic for Resubmitter-API
 package kafka
 
 import (
@@ -73,6 +74,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 	}
 
 	var tlsConfig *tls.Config
+
 	if useTlsStr := os.Getenv(tlsEnabledEnvKey); useTlsStr != "" {
 		tlsEnabled, err := strconv.ParseBool(useTlsStr)
 		if err != nil {
@@ -88,6 +90,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 	}
 
 	var skipVerify bool
+
 	if skipVerifyStr := os.Getenv(skipVerifyEnvKey); skipVerifyStr != "" {
 		skipVerifyParsed, err := strconv.ParseBool(skipVerifyStr)
 		if err != nil {
@@ -98,6 +101,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 	}
 
 	var kerberosConfig *kafka.KerberosConfig
+
 	if useKerberos := os.Getenv(enableKerberosKey); useKerberos != "" {
 		kerberosEnabled, err := strconv.ParseBool(useKerberos)
 		if err != nil {
@@ -113,6 +117,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 	}
 
 	var saslConfig *kafka.PlainSASLConfig
+
 	if useSASLStr := os.Getenv(saslEnabledEnvKey); useSASLStr != "" {
 		saslEnabled, err := strconv.ParseBool(useSASLStr)
 		if err != nil {
@@ -137,6 +142,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 	}
 
 	var disableCompression bool
+
 	if disableCompressionStr := os.Getenv(disableCompressionEnvKey); disableCompressionStr != "" {
 		disableCompressionParsed, err := strconv.ParseBool(disableCompressionStr)
 		if err != nil {

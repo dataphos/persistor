@@ -69,12 +69,14 @@ func main() {
 	storage, err := initializeStorage(storageConnectorType(os.Getenv(storageTypeEnv)))
 	if err != nil {
 		log.Error(err.Error(), 0)
+
 		return
 	}
 
 	pub, err := initializePublisher(publisherConnectorType(os.Getenv(publisherTypeEnv)))
 	if err != nil {
 		log.Error(err.Error(), 0)
+
 		return
 	}
 
@@ -87,6 +89,7 @@ func main() {
 
 	if err != nil {
 		log.Error(fmt.Errorf("error during resubmitter creation: %w", err).Error(), 0)
+
 		return
 	}
 

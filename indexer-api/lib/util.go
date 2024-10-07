@@ -46,17 +46,17 @@ const (
 	offsetParam = "offset"
 )
 
-func extractPaginationQueryParams(c *gin.Context) paginationQueryParams {
+func extractPaginationQueryParams(context *gin.Context) paginationQueryParams {
 	params := defaultPaginationQueryParams
 
-	limit, _ := strconv.Atoi(c.Query(limitParam))
+	limit, _ := strconv.Atoi(context.Query(limitParam))
 	if limit > 0 {
 		params.limit = limit
 	} else {
 		log.Info(log.UsingDefaultParameterValue(limitParam, strconv.Itoa(params.limit)))
 	}
 
-	offset, _ := strconv.Atoi(c.Query(offsetParam))
+	offset, _ := strconv.Atoi(context.Query(offsetParam))
 	if offset >= 0 {
 		params.offset = offset
 	} else {
@@ -77,12 +77,12 @@ const (
 	dateFormat = "2006-01-02T15:04:05.99999999Z"
 )
 
-func extractIntervalQueryParams(c *gin.Context) (*intervalQueryParams, error) {
+func extractIntervalQueryParams(context *gin.Context) (*intervalQueryParams, error) {
 	var to time.Time
 	var from time.Time
 	var err error
 
-	lbString := c.Query(fromParam)
+	lbString := context.Query(fromParam)
 	if len(lbString) == 0 {
 		to = time.Time{}
 		log.Info(log.UsingDefaultParameterValue(fromParam, to.Format(dateFormat)))
@@ -93,7 +93,7 @@ func extractIntervalQueryParams(c *gin.Context) (*intervalQueryParams, error) {
 		}
 	}
 
-	ubString := c.Query(toParam)
+	ubString := context.Query(toParam)
 	now := time.Now()
 	if len(ubString) == 0 {
 		from = now

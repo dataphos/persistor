@@ -45,13 +45,13 @@ type Interval struct {
 	Messages      []repo.Message `json:"messages"`
 }
 
-func (indexer *Indexer) GetAllInInterval(mongoCollection, brokerId string, from, to time.Time, limit, offset int, attributes []string) (*Interval, error) {
-	messages, err := indexer.Repository.GetAllInInterval(context.Background(), mongoCollection, from, to, brokerId, limit, offset, attributes)
+func (indexer *Indexer) GetAllInInterval(mongoCollection, brokerID string, from, to time.Time, limit, offset int, attributes []string) (*Interval, error) {
+	messages, err := indexer.Repository.GetAllInInterval(context.Background(), mongoCollection, from, to, brokerID, limit, offset, attributes)
 	if err != nil {
 		return nil, err
 	}
 
-	count, err := indexer.Repository.GetAllInIntervalDocumentCount(context.Background(), mongoCollection, from, to, brokerId)
+	count, err := indexer.Repository.GetAllInIntervalDocumentCount(context.Background(), mongoCollection, from, to, brokerID)
 	if err != nil {
 		return nil, err
 	}

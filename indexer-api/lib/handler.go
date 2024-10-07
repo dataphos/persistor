@@ -32,19 +32,19 @@ func NewHandler(indexer *Indexer) *Handler {
 }
 
 // GetUnique gets the metadata with the unique id supplied in the URL
-func (handler *Handler) GetUnique(c *gin.Context) {
-	id := c.Param("id")
-	mongoCollection := c.Param("mongo_collection")
+func (handler *Handler) GetUnique(context *gin.Context) {
+	id := context.Param("id")
+	mongoCollection := context.Param("mongo_collection")
 
 	metadata, err := handler.indexer.Get(mongoCollection, id, uniqueRequestAttributes)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, &metadata)
+	context.JSON(http.StatusOK, &metadata)
 }
 
 type GetAllRequestBody struct {
@@ -52,13 +52,13 @@ type GetAllRequestBody struct {
 }
 
 // GetAll gets the metadata with the unique ids supplied in the request body
-func (handler *Handler) GetAll(c *gin.Context) {
+func (handler *Handler) GetAll(context *gin.Context) {
 	var body GetAllRequestBody
-	mongoCollection := c.Param("mongo_collection")
+	mongoCollection := context.Param("mongo_collection")
 
-	err := c.BindJSON(&body)
+	err := context.BindJSON(&body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
@@ -67,40 +67,40 @@ func (handler *Handler) GetAll(c *gin.Context) {
 
 	metadata, err := handler.indexer.GetAll(mongoCollection, body.Ids, intervalRequest)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		context.JSON(http.StatusInternalServerError, gin.H{
 			"message": OnFailureMessage,
 			"error":   err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, &metadata)
+	context.JSON(http.StatusOK, &metadata)
 }
 
 // GetAllInInterval gets the message with the partial id supplied in the URL.
 // Because this operation can produce a multitude of messages, pagination is also implemented through URL params.
-func (handler *Handler) GetAllInInterval(c *gin.Context) {
-	brokerId := c.Param("id")
-	mongoCollection := c.Param("mongo_collection")
+func (handler *Handler) GetAllInInterval(context *gin.Context) {
+	brokerID := context.Param("id")
+	mongoCollection := context.Param("mongo_collection")
 
-	intervalParams, err := extractIntervalQueryParams(c)
+	intervalParams, err := extractIntervalQueryParams(context)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
 		return
 	}
-	paginationParams := extractPaginationQueryParams(c)
+	paginationParams := extractPaginationQueryParams(context)
 
-	metadata, err := handler.indexer.GetAllInInterval(mongoCollection, brokerId, intervalParams.to, intervalParams.from, paginationParams.limit, paginationParams.offset, intervalRequest)
+	metadata, err := handler.indexer.GetAllInInterval(mongoCollection, brokerID, intervalParams.to, intervalParams.from, paginationParams.limit, paginationParams.offset, intervalRequest)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		context.JSON(http.StatusInternalServerError, gin.H{
 			"message": OnFailureMessage,
 			"error":   err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, &metadata)
+	context.JSON(http.StatusOK, &metadata)
 }
 
 type GetQueriedRequestBody struct {
@@ -109,13 +109,13 @@ type GetQueriedRequestBody struct {
 
 // GetQueried gets all messages which contain metadata values given as query parameters.
 // Because this operation can produce a multitude of messages, pagination is also implemented through URL params.
-func (handler *Handler) GetQueried(c *gin.Context) {
-	mongoCollection := c.Param("mongo_collection")
+func (handler *Handler) GetQueried(context *gin.Context) {
+	mongoCollection := context.Param("mongo_collection")
 
 	var body GetQueriedRequestBody
-	err := c.BindJSON(&body)
+	err := context.BindJSON(&body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
@@ -124,7 +124,7 @@ func (handler *Handler) GetQueried(c *gin.Context) {
 
 	err = checkForInvalidQueryKeys(body.Filters)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
@@ -133,14 +133,14 @@ func (handler *Handler) GetQueried(c *gin.Context) {
 
 	err = convertTimestamps(body.Filters)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
 		return
 	}
 
-	paginationParams := extractPaginationQueryParams(c)
+	paginationParams := extractPaginationQueryParams(context)
 	queryInfo := repo.QueryInformation{
 		MongoCollection: mongoCollection,
 		Filters:         body.Filters,
@@ -152,11 +152,11 @@ func (handler *Handler) GetQueried(c *gin.Context) {
 	metadata, err := handler.indexer.GetQueried(queryInfo)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, &metadata)
+	context.JSON(http.StatusOK, &metadata)
 }

@@ -29,7 +29,7 @@ import (
 
 type Handler struct {
 	resubmitterJob *resubmitterJob
-	envTopicId     string
+	envTopicID     string
 }
 
 const (
@@ -39,18 +39,18 @@ const (
 	OnFailureMessage        = "resubmission failed"
 	OnNoTopicMessage        = "topic was not defined as a query parameter nor as an environment variable"
 
-	TopicIdEnv = "TOPIC_ID"
+	TopicIDEnv = "TOPIC_ID"
 )
 
 func NewHandler(resubmitter *Resubmitter) *Handler {
-	topicId := os.Getenv(TopicIdEnv)
-	if topicId == "" {
-		log.Warn(fmt.Sprintf("environment variable %s is not defined", TopicIdEnv))
+	topicID := os.Getenv(TopicIDEnv)
+	if topicID == "" {
+		log.Warn(fmt.Sprintf("environment variable %s is not defined", TopicIDEnv))
 	}
 
 	return &Handler{
 		resubmitterJob: &resubmitterJob{resubmitter: *resubmitter},
-		envTopicId:     topicId,
+		envTopicID:     topicID,
 	}
 }
 
@@ -65,23 +65,23 @@ type response struct {
 	Errors  *ResubmitResult `json:"errors,omitempty"`
 }
 
-func (handler *Handler) ResubmitIds(c *gin.Context) {
-	topicId := handler.getTopicIdFromQueryOrEnv(c)
-	if topicId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
+func (handler *Handler) ResubmitIds(context *gin.Context) {
+	topicID := handler.getTopicIDFromQueryOrEnv(context)
+	if topicID == "" {
+		context.JSON(http.StatusBadRequest, gin.H{
 			"msg": OnNoTopicMessage,
 		})
 
 		return
 	}
 
-	mongoCollection := c.Param("mongo_collection")
+	mongoCollection := context.Param("mongo_collection")
 
 	var body request
 
-	err := c.BindJSON(&body)
+	err := context.BindJSON(&body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"msg":   OnBadRequestMessage,
 			"error": err.Error(),
 		})
@@ -90,10 +90,10 @@ func (handler *Handler) ResubmitIds(c *gin.Context) {
 
 	handler.resubmitterJob.resetCounters()
 
-	results := handler.resubmitterJob.Resubmit(topicId, mongoCollection, body.Ids)
+	results := handler.resubmitterJob.Resubmit(topicID, mongoCollection, body.Ids)
 
 	statusCode := chooseHTTPStatusCode(handler.resubmitterJob, results)
-	c.JSON(statusCode, &response{
+	context.JSON(statusCode, &response{
 		Status:  statusCode,
 		Msg:     chooseResponseMessage(statusCode),
 		Summary: handler.resubmitterJob,
@@ -101,13 +101,13 @@ func (handler *Handler) ResubmitIds(c *gin.Context) {
 	})
 }
 
-func (handler *Handler) getTopicIdFromQueryOrEnv(c *gin.Context) string {
-	topicId := c.Query(topicParam)
-	if topicId == "" {
-		topicId = handler.envTopicId
+func (handler *Handler) getTopicIDFromQueryOrEnv(context *gin.Context) string {
+	topicID := context.Query(topicParam)
+	if topicID == "" {
+		topicID = handler.envTopicID
 	}
 
-	return topicId
+	return topicID
 }
 
 func chooseHTTPStatusCode(job *resubmitterJob, results ResubmitResult) int {
@@ -137,29 +137,29 @@ func chooseResponseMessage(statusCode int) string {
 }
 
 type intervalRequest struct {
-	BrokerId   string     `json:"broker_id" binding:"required"`
+	BrokerID   string     `json:"broker_id" binding:"required"`
 	LowerBound *time.Time `json:"lb,omitempty"`
 	UpperBound *time.Time `json:"ub,omitempty"`
 }
 
-func (handler *Handler) ResubmitInterval(c *gin.Context) {
-	topicId := handler.getTopicIdFromQueryOrEnv(c)
-	if topicId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
+func (handler *Handler) ResubmitInterval(context *gin.Context) {
+	topicID := handler.getTopicIDFromQueryOrEnv(context)
+	if topicID == "" {
+		context.JSON(http.StatusBadRequest, gin.H{
 			"msg": OnNoTopicMessage,
 		})
 
 		return
 	}
 
-	mongoCollection := c.Param("mongo_collection")
+	mongoCollection := context.Param("mongo_collection")
 
 	var body intervalRequest
 
-	err := c.BindJSON(&body)
+	err := context.BindJSON(&body)
 	if err != nil {
 		err = fmt.Errorf("error occurred during binding JSON to request body: %w", err)
-		c.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusBadRequest, gin.H{
 			"msg":   OnBadRequestMessage,
 			"error": err.Error(),
 		})
@@ -171,10 +171,10 @@ func (handler *Handler) ResubmitInterval(c *gin.Context) {
 
 	handler.resubmitterJob.resetCounters()
 
-	results := handler.resubmitterJob.ResubmitInterval(topicId, mongoCollection, body.BrokerId, *body.LowerBound, *body.UpperBound)
+	results := handler.resubmitterJob.ResubmitInterval(topicID, mongoCollection, body.BrokerID, *body.LowerBound, *body.UpperBound)
 
 	statusCode := chooseHTTPStatusCode(handler.resubmitterJob, results)
-	c.JSON(statusCode, &response{
+	context.JSON(statusCode, &response{
 		Status:  statusCode,
 		Msg:     chooseResponseMessage(statusCode),
 		Summary: handler.resubmitterJob,
@@ -196,23 +196,25 @@ func checkIfParamsMissing(body *intervalRequest) {
 	}
 }
 
-func (handler *Handler) ResubmitQueried(c *gin.Context) {
-	topicId := handler.getTopicIdFromQueryOrEnv(c)
-	if topicId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
+func (handler *Handler) ResubmitQueried(context *gin.Context) {
+	topicID := handler.getTopicIDFromQueryOrEnv(context)
+	if topicID == "" {
+		context.JSON(http.StatusBadRequest, gin.H{
 			"msg": OnNoTopicMessage,
 		})
 
 		return
 	}
 
-	mongoCollection := c.Param("mongo_collection")
+	mongoCollection := context.Param("mongo_collection")
 
 	var body util.QueryRequestBody
-	err := c.BindJSON(&body)
+
+	err := context.BindJSON(&body)
 	if err != nil {
 		err = fmt.Errorf("error occurred during binding JSON to request body: %w", err)
-		c.JSON(http.StatusBadRequest, gin.H{
+
+		context.JSON(http.StatusBadRequest, gin.H{
 			"msg":   OnBadRequestMessage,
 			"error": err.Error(),
 		})
@@ -222,10 +224,11 @@ func (handler *Handler) ResubmitQueried(c *gin.Context) {
 
 	handler.resubmitterJob.resetCounters()
 
-	results := handler.resubmitterJob.ResubmitQuery(topicId, mongoCollection, body)
+	results := handler.resubmitterJob.ResubmitQuery(topicID, mongoCollection, body)
 
 	statusCode := chooseHTTPStatusCode(handler.resubmitterJob, results)
-	c.JSON(statusCode, &response{
+
+	context.JSON(statusCode, &response{
 		Status:  statusCode,
 		Msg:     chooseResponseMessage(statusCode),
 		Summary: handler.resubmitterJob,

@@ -113,8 +113,8 @@ func Serve(handler *Handler, opts ...ServerOption) {
 	}
 
 	router := gin.Default()
-	var wg sync.WaitGroup
-	registerIndexerEndpoints(handler, router, &wg)
+	var waitGroup sync.WaitGroup
+	registerIndexerEndpoints(handler, router, &waitGroup)
 
 	srv := &http.Server{
 		Addr:              config.Addr,
@@ -129,32 +129,32 @@ func Serve(handler *Handler, opts ...ServerOption) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	initiateGracefulShutdown(srv, &wg)
+	initiateGracefulShutdown(srv, &waitGroup)
 }
 
-func registerIndexerEndpoints(handler *Handler, router *gin.Engine, wg *sync.WaitGroup) {
-	router.GET("/exact/:mongo_collection/:id", func(c *gin.Context) {
-		wg.Add(1)
-		handler.GetUnique(c)
-		wg.Done()
+func registerIndexerEndpoints(handler *Handler, router *gin.Engine, waitGroup *sync.WaitGroup) {
+	router.GET("/exact/:mongo_collection/:id", func(context *gin.Context) {
+		waitGroup.Add(1)
+		handler.GetUnique(context)
+		waitGroup.Done()
 	})
 
-	router.POST("/all/:mongo_collection", func(c *gin.Context) {
-		wg.Add(1)
-		handler.GetAll(c)
-		wg.Done()
+	router.POST("/all/:mongo_collection", func(context *gin.Context) {
+		waitGroup.Add(1)
+		handler.GetAll(context)
+		waitGroup.Done()
 	})
 
-	router.GET("/range/:mongo_collection/:id", func(c *gin.Context) {
-		wg.Add(1)
-		handler.GetAllInInterval(c)
-		wg.Done()
+	router.GET("/range/:mongo_collection/:id", func(context *gin.Context) {
+		waitGroup.Add(1)
+		handler.GetAllInInterval(context)
+		waitGroup.Done()
 	})
 
-	router.POST("/query/:mongo_collection", func(c *gin.Context) {
-		wg.Add(1)
-		handler.GetQueried(c)
-		wg.Done()
+	router.POST("/query/:mongo_collection", func(context *gin.Context) {
+		waitGroup.Add(1)
+		handler.GetQueried(context)
+		waitGroup.Done()
 	})
 }
 
@@ -173,11 +173,11 @@ func startServer(srv *http.Server, config ServerConfig) {
 	}()
 }
 
-func initiateGracefulShutdown(srv *http.Server, wg *sync.WaitGroup) {
+func initiateGracefulShutdown(srv *http.Server, waitGroup *sync.WaitGroup) {
 	log.Info("graceful shut down initiated, waiting for all goroutines to finish")
 
 	// Waiting for all jobs to be done.
-	wg.Wait()
+	waitGroup.Wait()
 
 	log.Info("all goroutines finished, ready for shutdown")
 

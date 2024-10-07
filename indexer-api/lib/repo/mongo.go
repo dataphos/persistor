@@ -150,7 +150,7 @@ func (repo *repo) GetAll(ctx context.Context, mongoCollection string, ids, attri
 
 // GetAllInInterval returns a collection of a subset of metadata for the specific time interval and broker_id.
 // The metadata subset that is returned consists of message_id, message count, and location (both path and position).
-func (repo *repo) GetAllInInterval(ctx context.Context, mongoCollection string, to, from time.Time, brokerId string, limit, offset int, attributesList []string) ([]Message, error) {
+func (repo *repo) GetAllInInterval(ctx context.Context, mongoCollection string, to, from time.Time, brokerID string, limit, offset int, attributesList []string) ([]Message, error) {
 	projection := bson.D{
 		{Key: ObjectId, Value: 0},
 	}
@@ -163,7 +163,7 @@ func (repo *repo) GetAllInInterval(ctx context.Context, mongoCollection string, 
 			"$gte": to,
 			"$lt":  from,
 		},
-		BrokerId: brokerId,
+		BrokerId: brokerID,
 	}
 
 	cursor, err := repo.database.Collection(mongoCollection).Find(
@@ -187,13 +187,13 @@ func (repo *repo) GetAllInInterval(ctx context.Context, mongoCollection string, 
 }
 
 // GetAllInIntervalDocumentCount returns the count of documents that would be returned by the GetAllInInterval.
-func (repo *repo) GetAllInIntervalDocumentCount(ctx context.Context, mongoCollection string, to, from time.Time, brokerId string) (int64, error) {
+func (repo *repo) GetAllInIntervalDocumentCount(ctx context.Context, mongoCollection string, to, from time.Time, brokerID string) (int64, error) {
 	filter := bson.M{
 		PublishTime: bson.M{
 			"$gte": to,
 			"$lt":  from,
 		},
-		BrokerId: brokerId,
+		BrokerId: brokerID,
 	}
 
 	count, err := repo.database.Collection(mongoCollection).CountDocuments(ctx, filter)

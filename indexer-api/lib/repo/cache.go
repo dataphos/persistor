@@ -72,13 +72,13 @@ func (cacheRepo *cached) GetAll(ctx context.Context, mongoCollection string, ids
 
 // GetAllInInterval returns a collection of a subset of metadata for the specific time interval and broker_id.
 // The metadata subset that is returned consists of message_id, message count, and location (both path and position).
-func (cacheRepo *cached) GetAllInInterval(ctx context.Context, mongoCollection string, to, from time.Time, brokerId string, limit, offset int, attributesList []string) ([]Message, error) {
-	return cacheRepo.Repository.GetAllInInterval(ctx, mongoCollection, to, from, brokerId, limit, offset, attributesList)
+func (cacheRepo *cached) GetAllInInterval(ctx context.Context, mongoCollection string, to, from time.Time, brokerID string, limit, offset int, attributesList []string) ([]Message, error) {
+	return cacheRepo.Repository.GetAllInInterval(ctx, mongoCollection, to, from, brokerID, limit, offset, attributesList)
 }
 
 // GetAllInIntervalDocumentCount returns the count of documents that would be returned by the GetAllInInterval.
-func (cacheRepo *cached) GetAllInIntervalDocumentCount(ctx context.Context, mongoCollection string, to, from time.Time, brokerId string) (int64, error) {
-	key := constructDocumentCountKeyFromParams(to, from, brokerId, mongoCollection)
+func (cacheRepo *cached) GetAllInIntervalDocumentCount(ctx context.Context, mongoCollection string, to, from time.Time, brokerID string) (int64, error) {
+	key := constructDocumentCountKeyFromParams(to, from, brokerID, mongoCollection)
 
 	cacheRepo.mtx.RLock(key)
 	count, hit := cacheRepo.tryGetIntervalAndBrokerIDDocumentCount(key)
@@ -90,7 +90,7 @@ func (cacheRepo *cached) GetAllInIntervalDocumentCount(ctx context.Context, mong
 	cacheRepo.mtx.Lock(key)
 	defer cacheRepo.mtx.Unlock(key)
 
-	count, err := cacheRepo.Repository.GetAllInIntervalDocumentCount(ctx, mongoCollection, to, from, brokerId)
+	count, err := cacheRepo.Repository.GetAllInIntervalDocumentCount(ctx, mongoCollection, to, from, brokerID)
 	if err != nil {
 		return 0, err
 	}
@@ -100,8 +100,8 @@ func (cacheRepo *cached) GetAllInIntervalDocumentCount(ctx context.Context, mong
 	return count, err
 }
 
-func constructDocumentCountKeyFromParams(to, from time.Time, brokerId, mongoCollection string) string {
-	return fmt.Sprintf("%v_%v_%v_%v", to, from, brokerId, mongoCollection)
+func constructDocumentCountKeyFromParams(to, from time.Time, brokerID, mongoCollection string) string {
+	return fmt.Sprintf("%v_%v_%v_%v", to, from, brokerID, mongoCollection)
 }
 
 func (cacheRepo *cached) tryGetIntervalAndBrokerIDDocumentCount(key string) (int64, bool) {

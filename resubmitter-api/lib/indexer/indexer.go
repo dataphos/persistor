@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package indexer contains the logic for Resubmitter to communicate with Indexer
 package indexer
 
 import (
@@ -36,7 +37,7 @@ type Message struct {
 	BrokerMessageID      string            `bson:"broker_msg_id,omitempty" json:"broker_msg_id,omitempty"`
 	BusinessSourceKey    string            `bson:"business_source_key,omitempty" json:"business_source_key,omitempty"`
 	BusinessObjectKey    string            `bson:"business_object_key,omitempty" json:"business_object_key,omitempty"`
-	UniqueId             string            `bson:"unique_id,omitempty" json:"unique_id,omitempty"`
+	UniqueID             string            `bson:"unique_id,omitempty" json:"unique_id,omitempty"`
 	IndexSourceKey       string            `bson:"index_source_key,omitempty" json:"index_source_key,omitempty"`
 	OrderingKey          string            `bson:"ordering_key,omitempty" json:"ordering_key,omitempty"`
 	LocationKey          string            `bson:"location_key,omitempty" json:"location_key,omitempty"`
@@ -63,16 +64,16 @@ type Indexer interface {
 }
 
 type indexer struct {
-	baseUrl string
+	baseURL string
 }
 
 func FromEnv() Indexer {
-	return New(os.Getenv(BaseUrlEnv))
+	return New(os.Getenv(BaseURLEnv))
 }
 
 const (
-	BaseUrlEnv                       = "INDEXER_URL"
-	GetByUniqueIdEndpoint            = "/exact/"
+	BaseURLEnv                       = "INDEXER_URL"
+	GetByUniqueIDEndpoint            = "/exact/"
 	GetAllEndpoint                   = "/all"
 	GetByIntervalAndBrokerIDEndpoint = "/range/"
 	GetByQueryParamsEndpoint         = "/query/"
@@ -80,12 +81,12 @@ const (
 	requestCreationFailedMessage = "request creation failed"
 )
 
-func New(baseUrl string) Indexer {
-	return &indexer{baseUrl: baseUrl}
+func New(baseURL string) Indexer {
+	return &indexer{baseURL: baseURL}
 }
 
 func (indexer *indexer) Get(id string) ([]Message, error) {
-	url := indexer.constructGetByUniqueIdUrl(id)
+	url := indexer.constructGetByUniqueIDURL(id)
 	log.Debug(fmt.Sprintf("sending request to Indexer API on %s", url), 0)
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
@@ -108,8 +109,8 @@ func (indexer *indexer) Get(id string) ([]Message, error) {
 	return extractIndexerMessage(response)
 }
 
-func (indexer *indexer) constructGetByUniqueIdUrl(id string) string {
-	return indexer.baseUrl + GetByUniqueIdEndpoint + id
+func (indexer *indexer) constructGetByUniqueIDURL(id string) string {
+	return indexer.baseURL + GetByUniqueIDEndpoint + id
 }
 
 func extractIndexerMessage(response *http.Response) ([]Message, error) {
@@ -119,6 +120,7 @@ func extractIndexerMessage(response *http.Response) ([]Message, error) {
 	}
 
 	var messages []Message
+
 	err = json.Unmarshal(body, &messages)
 	if err != nil {
 		return nil, errors.Wrap(err, "can't unmarshall response body")
@@ -133,7 +135,7 @@ func (indexer *indexer) GetAll(mongoCollection string, ids []string) ([]Message,
 		return nil, errors.Wrap(err, "can't construct request body")
 	}
 
-	url := indexer.constructGetAllUrl(mongoCollection)
+	url := indexer.constructGetAllURL(mongoCollection)
 	log.Debug(fmt.Sprintf("sending request to Indexer API on %s", url), 0)
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, url, body)
@@ -171,8 +173,8 @@ func constructGetAllRequestBody(ids []string) (io.Reader, error) {
 	return bytes.NewReader(body), nil
 }
 
-func (indexer *indexer) constructGetAllUrl(mongoCollection string) string {
-	return indexer.baseUrl + GetAllEndpoint + fmt.Sprintf("/%s", mongoCollection)
+func (indexer *indexer) constructGetAllURL(mongoCollection string) string {
+	return indexer.baseURL + GetAllEndpoint + fmt.Sprintf("/%s", mongoCollection)
 }
 
 func extractIndexerMessages(response *http.Response) ([]Message, error) {
@@ -191,8 +193,8 @@ func extractIndexerMessages(response *http.Response) ([]Message, error) {
 	return messages, nil
 }
 
-func (indexer *indexer) GetAllInInterval(mongoCollection, brokerId string, from, to time.Time, limit, offset int) (*IntervalQueryResponse, error) {
-	url := indexer.constructGetByIntervalAndBrokerIdUrl(mongoCollection, brokerId, from, to, limit, offset)
+func (indexer *indexer) GetAllInInterval(mongoCollection, brokerID string, from, to time.Time, limit, offset int) (*IntervalQueryResponse, error) {
+	url := indexer.constructGetByIntervalAndBrokerIDURL(mongoCollection, brokerID, from, to, limit, offset)
 	log.Debug(fmt.Sprintf("sending request to Indexer API on %s", url), 0)
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
@@ -224,13 +226,13 @@ const (
 	DateFormat = "2006-01-02T15:04:05.99999999Z"
 )
 
-func (indexer *indexer) constructGetByIntervalAndBrokerIdUrl(mongoCollection, brokerId string, from, to time.Time, limit, offset int) string {
+func (indexer *indexer) constructGetByIntervalAndBrokerIDURL(mongoCollection, brokerID string, from, to time.Time, limit, offset int) string {
 	return fmt.Sprintf(
 		"%s%s%s/%s?%s=%s&%s=%s&%s=%v&%s=%v",
-		indexer.baseUrl,
+		indexer.baseURL,
 		GetByIntervalAndBrokerIDEndpoint,
 		mongoCollection,
-		brokerId,
+		brokerID,
 		From, from.Format(DateFormat),
 		To, to.Format(DateFormat),
 		Limit, limit,
@@ -246,10 +248,12 @@ func extractIndexerIntervalQueryResponse(response *http.Response) (*IntervalQuer
 
 	if response.StatusCode != 200 {
 		var indexerResponse map[string]string
+
 		err = json.Unmarshal(body, &indexerResponse)
 		if err != nil {
 			return nil, errors.Wrap(err, "can't read error from response body")
 		}
+
 		return nil, errors.New(indexerResponse["error"])
 	}
 
@@ -296,7 +300,7 @@ func (indexer *indexer) GetQueried(mongoCollection string, queryBody util.QueryR
 func (indexer *indexer) constructGetQueriedURL(mongoCollection string, limit, offset int) string {
 	return fmt.Sprintf(
 		"%s%s%s?%s=%v&%s=%v",
-		indexer.baseUrl,
+		indexer.baseURL,
 		GetByQueryParamsEndpoint,
 		mongoCollection,
 		Limit, limit,

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package servicebus contains servicebus logic for Resubmitter-API
 package servicebus
 
 import (
@@ -53,8 +54,8 @@ func FromEnv() (*Publisher, error) {
 	return &Publisher{client: client}, nil
 }
 
-func (publisher *Publisher) Topic(topicId string) (publisher.Topic, error) {
-	topic, err := publisher.client.Topic(topicId)
+func (publisher *Publisher) Topic(topicID string) (publisher.Topic, error) {
+	topic, err := publisher.client.Topic(topicID)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating topic failed")
 	}

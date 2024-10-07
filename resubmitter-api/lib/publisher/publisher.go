@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package publisher contains the logic for publishing the Resubmitter messages
 package publisher
 
 import (

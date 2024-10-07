@@ -47,7 +47,7 @@ func processRecords(messages []indexer.Message, records []persistor.Record, mess
 		targetIdx := *message.LocationPosition - 1
 		record := records[targetIdx]
 		record.Metadata = packageMetadata(&message)
-		record.ID = message.UniqueId
+		record.ID = message.UniqueID
 
 		if messageOrderingEnabled {
 			groupedRecords[message.OrderingKey] = append(groupedRecords[message.OrderingKey], record)
@@ -84,7 +84,7 @@ func packageMetadata(message *indexer.Message) map[string]string {
 func tagAsFailures(messages []indexer.Message, reason string, errc chan<- PipelineError) {
 	for _, message := range messages {
 		errc <- PipelineError{
-			Id:     message.UniqueId,
+			Id:     message.UniqueID,
 			Reason: reason,
 		}
 	}
@@ -96,12 +96,13 @@ func merge(errChannels ...<-chan PipelineError) <-chan PipelineError {
 	go func() {
 		defer close(out)
 
-		var wg sync.WaitGroup
+		var waitGroup sync.WaitGroup
 
 		for _, errChan := range errChannels {
-			wg.Add(1)
+			waitGroup.Add(1)
+
 			go func(errChan <-chan PipelineError) {
-				defer wg.Done()
+				defer waitGroup.Done()
 
 				for err := range errChan {
 					out <- err
@@ -109,7 +110,7 @@ func merge(errChannels ...<-chan PipelineError) <-chan PipelineError {
 			}(errChan)
 		}
 
-		wg.Wait()
+		waitGroup.Wait()
 	}()
 
 	return out

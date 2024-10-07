@@ -52,7 +52,7 @@ func (i *Mock) GetAll(_ string, _ []string) ([]Message, error) {
 		return nil, response
 	}
 
-	return nil, nil
+	return nil, nil //nolint:nilnil // no need
 }
 
 func (i *Mock) Get(_ string) ([]Message, error) {
@@ -60,12 +60,13 @@ func (i *Mock) Get(_ string) ([]Message, error) {
 	case []Message:
 		var messages []Message
 		messages = append(messages, response[0])
+
 		return messages, nil
 	case error:
 		return nil, response
 	}
 
-	return nil, nil
+	return nil, nil //nolint:nilnil // no need
 }
 
 func (i *Mock) GetAllInInterval(_ string, _ string, _, _ time.Time, limit, offset int) (*IntervalQueryResponse, error) {
@@ -94,7 +95,7 @@ func (i *Mock) GetAllInInterval(_ string, _ string, _, _ time.Time, limit, offse
 		return nil, response
 	}
 
-	return nil, nil
+	return nil, nil //nolint:nilnil // no need
 }
 
 func (i *Mock) GetQueried(_ string, _ util.QueryRequestBody, limit, offset int) (*IntervalQueryResponse, error) {
@@ -123,5 +124,5 @@ func (i *Mock) GetQueried(_ string, _ util.QueryRequestBody, limit, offset int) 
 		return nil, response
 	}
 
-	return nil, nil
+	return nil, nil //nolint:nilnil // no need
 }

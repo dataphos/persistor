@@ -45,8 +45,8 @@ const (
 	IndexingSenderErrorCategory = "Metadata sender error"
 )
 
-func (p *Persistor) MiniBatchProcessor(ctx context.Context, batchPos int, batch []streamproc.Message, wg *sync.WaitGroup, parallelErrors []error) {
-	defer wg.Done()
+func (p *Persistor) MiniBatchProcessor(ctx context.Context, batchPos int, batch []streamproc.Message, waitGroup *sync.WaitGroup, parallelErrors []error) {
+	defer waitGroup.Done()
 	// persisting the batch named after its first message.
 	objectName := p.Storage.GenerateBlobName(batch[0])
 

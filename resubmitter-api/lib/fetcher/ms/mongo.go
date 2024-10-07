@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package ms contains the Mongo DB logic for Resubmitter-API
 package ms
 
 import (

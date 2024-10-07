@@ -116,9 +116,9 @@ func Serve(handler *Handler, opts ...ServerOption) {
 
 	router := gin.Default()
 
-	var wg sync.WaitGroup
+	var waitGroup sync.WaitGroup
 
-	registerResubmitterEndpoints(handler, router, &wg)
+	registerResubmitterEndpoints(handler, router, &waitGroup)
 
 	srv := &http.Server{
 		Addr:              config.Addr,
@@ -135,7 +135,7 @@ func Serve(handler *Handler, opts ...ServerOption) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	initiateGracefulShutdown(srv, &wg)
+	initiateGracefulShutdown(srv, &waitGroup)
 }
 
 func startServer(srv *http.Server, config ServerConfig) {
@@ -153,11 +153,11 @@ func startServer(srv *http.Server, config ServerConfig) {
 	}()
 }
 
-func initiateGracefulShutdown(srv *http.Server, wg *sync.WaitGroup) {
+func initiateGracefulShutdown(srv *http.Server, waitGroup *sync.WaitGroup) {
 	log.Info("graceful shut down initiated, waiting for all goroutines to finish")
 
 	// Waiting for all jobs to be done.
-	wg.Wait()
+	waitGroup.Wait()
 
 	log.Info("all goroutines finished, ready for shutdown")
 
@@ -173,22 +173,22 @@ func initiateGracefulShutdown(srv *http.Server, wg *sync.WaitGroup) {
 	cancel()
 }
 
-func registerResubmitterEndpoints(handler *Handler, router *gin.Engine, wg *sync.WaitGroup) {
-	router.POST("/resubmit/:mongo_collection", func(c *gin.Context) {
-		wg.Add(1)
-		handler.ResubmitIds(c)
-		wg.Done()
+func registerResubmitterEndpoints(handler *Handler, router *gin.Engine, waitGroup *sync.WaitGroup) {
+	router.POST("/resubmit/:mongo_collection", func(context *gin.Context) {
+		waitGroup.Add(1)
+		handler.ResubmitIds(context)
+		waitGroup.Done()
 	})
 
-	router.POST("/range/:mongo_collection", func(c *gin.Context) {
-		wg.Add(1)
-		handler.ResubmitInterval(c)
-		wg.Done()
+	router.POST("/range/:mongo_collection", func(context *gin.Context) {
+		waitGroup.Add(1)
+		handler.ResubmitInterval(context)
+		waitGroup.Done()
 	})
 
-	router.POST("/query/:mongo_collection", func(c *gin.Context) {
-		wg.Add(1)
-		handler.ResubmitQueried(c)
-		wg.Done()
+	router.POST("/query/:mongo_collection", func(context *gin.Context) {
+		waitGroup.Add(1)
+		handler.ResubmitQueried(context)
+		waitGroup.Done()
 	})
 }

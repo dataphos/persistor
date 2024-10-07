@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package gs contains the Google Cloud Storage logic for the fetcher component
 package gs
 
 import (

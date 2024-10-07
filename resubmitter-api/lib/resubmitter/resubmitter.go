@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package resubmitter contains the core Resubmitter logic
 package resubmitter
 
 import (
@@ -158,7 +159,7 @@ type packageJob struct {
 }
 
 type publishJob struct {
-	topicId string
+	topicID string
 	records map[string][]persistor.Record
 }
 
@@ -184,7 +185,7 @@ func (resubmitter *Resubmitter) convertSingle(blob []byte, messages []indexer.Me
 	var records []persistor.Record
 
 	record := persistor.Record{
-		ID:       messages[0].UniqueId,
+		ID:       messages[0].UniqueID,
 		Data:     blob,
 		Metadata: packageMetadata(&messages[0]),
 	}
