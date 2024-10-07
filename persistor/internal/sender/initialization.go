@@ -48,7 +48,7 @@ func NewTopic(ctx context.Context, senderConfig config.SenderConfig, topicID str
 	case config.TypeKafka:
 		producerSettings := kafka.DefaultProducerSettings
 		// since every batch needs to be processed before the next one is consumed, the consumer batch settings
-		// give the maximum needed producer buffer size
+		// give the maximum needed producer buffer size.
 		producerSettings.BatchSize = batchSize
 		producerSettings.BatchBytes = int64(batchBytes)
 

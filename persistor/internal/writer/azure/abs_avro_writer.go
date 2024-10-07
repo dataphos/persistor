@@ -40,7 +40,7 @@ type ABSAvroWriter struct {
 	record common.AvroRecord
 }
 
-// Write stores the data of messages to storage in batches
+// Write stores the data of messages to storage in batches.
 func (writer *ABSAvroWriter) Write(ctx context.Context, bucketName string, objectName string, msgs ...streamproc.Message) *common.ProcError {
 	// Start with an empty byte array.
 	var bufBytes []byte
@@ -54,7 +54,7 @@ func (writer *ABSAvroWriter) Write(ctx context.Context, bucketName string, objec
 		return common.NewProcessingError(len(msgs), err, errCode)
 	}
 
-	// Upload the buffer to the blob
+	// Upload the buffer to the blob.
 	_, err = writer.client.UploadBuffer(ctx, bucketName, objectName, buf.Bytes(), &azblob.UploadBufferOptions{})
 	if err != nil {
 		return common.NewProcessingError(len(msgs), err, common.WriterError)
@@ -85,7 +85,7 @@ func NewABSWriter(storageAccountID string) (*ABSWriter, error) {
 }
 
 // NewAzblobClient constructor for container client which will be using DefaultAzureCredential with environment variables.
-// All environment variables must be set in order, for credentials, to be created
+// All environment variables must be set in order, for credentials, to be created.
 func NewAzblobClient(serviceURL string) (azblob.Client, error) {
 	credential, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {

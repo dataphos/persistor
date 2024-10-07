@@ -27,14 +27,14 @@ import (
 
 // Rename to kafkaIterator/Receiver...
 
-// NewPubSubReceiver returns a broker.BatchedReceiver that receives messages from a pubsub.Receiver
+// NewPubSubReceiver returns a broker.BatchedReceiver that receives messages from a pubsub.Receiver.
 func NewPubSubReceiver(ctx context.Context, config config.PubSubReceiverConfig, batchSettings config.BatchSettings) (receiver broker.BatchedReceiver, err error) {
 	receiverConfig := pubsub.ReceiverConfig{
 		ProjectID:      config.ProjectID,
 		SubscriptionID: config.SubID,
 	}
 	receiveSettings := pubsub.DefaultReceiveSettings
-	// we must be able to pull simultaneously at least as much as our batch settings dictate, otherwise we will be waiting for timeout to hit
+	// we must be able to pull simultaneously at least as much as our batch settings dictate, otherwise we will be waiting for timeout to hit.
 	if batchSettings.BatchSize > receiveSettings.MaxOutstandingMessages {
 		receiveSettings.MaxOutstandingMessages = batchSettings.BatchSize
 	}
@@ -56,7 +56,7 @@ func NewPubSubReceiver(ctx context.Context, config config.PubSubReceiverConfig, 
 		brokerutil.IntoBatchedReceiverSettings{NumGoroutines: 1}), nil
 }
 
-// NewServiceBusReceiver makes a service bus iterator, converts it to a broker.BatchedReceiver and uses it to build another broker.BatchedReceiver which will not call the callback until the batch is full or time has run out
+// NewServiceBusReceiver makes a service bus iterator, converts it to a broker.BatchedReceiver and uses it to build another broker.BatchedReceiver which will not call the callback until the batch is full or time has run out.
 func NewServiceBusReceiver(config config.ServiceBusReceiverConfig, batchSettings config.BatchSettings) (receiver broker.BatchedReceiver, err error) {
 	iteratorConfig := servicebus.IteratorConfig{
 		ConnectionString: config.ConnectionString,

@@ -33,7 +33,7 @@ import (
 
 const indexerConfigFileName = "config/indexer.toml"
 
-// Run receives persistor message metadata and writes it into mongo
+// Run receives persistor message metadata and writes it into mongo.
 func Run() {
 	indexerConfig := &config.IndexerConfig{}
 	tomlError := fig.Load(indexerConfig, fig.File(indexerConfigFileName), fig.UseEnv(""))
@@ -67,7 +67,7 @@ func Run() {
 	runCtx := graceful.WithSignalShutdown(context.Background()) // context for streamproc executor, will be canceled when a signal is sent
 
 	go func() {
-		// when the context is canceled, wait for handler to clean up any messages still left inside
+		// when the context is canceled, wait for handler to clean up any messages still left inside.
 		<-runCtx.Done()
 		handler.End()
 	}()
@@ -83,9 +83,9 @@ func Run() {
 		persistor.RunBatchRecordIteratorHandler(runCtx, handler, indexerConfig.Reader.Kafka, indexerConfig.BatchSettings)
 	}
 
-	handler.cancel() // to return from the goroutine calling End
+	handler.cancel() // to return from the goroutine calling End.
 
-	// context used to stop metrics server
+	// context used to stop metrics server.
 	ctx, cancel := context.WithTimeout(context.Background(), common.ServerShutdownTimeout)
 	defer cancel()
 

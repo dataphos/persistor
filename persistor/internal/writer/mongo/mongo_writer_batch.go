@@ -27,7 +27,7 @@ import (
 )
 
 // MongoBatchWriter The Mongo batch writer.
-// Not a BlobWriter
+// Not a BlobWriter.
 type MongoBatchWriter struct {
 	collection *mongo.Collection
 }
@@ -42,7 +42,7 @@ func (writer *MongoBatchWriter) Write(ctx context.Context, records []interface{}
 	_, errWrite := writer.collection.InsertMany(ctx, records, options.InsertMany().SetBypassDocumentValidation(true),
 		options.InsertMany().SetOrdered(false))
 	if errWrite == nil {
-		// everything okay
+		// everything okay.
 		return nil, nil
 	}
 
@@ -53,7 +53,7 @@ func (writer *MongoBatchWriter) Write(ctx context.Context, records []interface{}
 		return nil, fmt.Errorf("mongo writer: %w", errWrite)
 	}
 
-	// iterate over the write error and return the indices of records that failed to write
+	// iterate over the write error and return the indices of records that failed to write.
 	failedIndices := make([]int, len(errMongo.WriteErrors))
 	for i, bulkErr := range errMongo.WriteErrors {
 		failedIndices[i] = bulkErr.Index

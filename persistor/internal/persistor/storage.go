@@ -32,10 +32,10 @@ const (
 )
 
 const (
-	// LeftAttributeSignal and RightAttributeSignal stand around message version keys in storage mask, for example: day/{country_origin}/hour
+	// LeftAttributeSignal and RightAttributeSignal stand around message version keys in storage mask, for example: day/{country_origin}/hour.
 	LeftAttributeSignal  = '{'
 	RightAttributeSignal = '}'
-	// MinMaskAttributeKeyLen minimum length of mask member that can be interpreted as version key (at least one character between curly brackets)
+	// MinMaskAttributeKeyLen minimum length of mask member that can be interpreted as version key (at least one character between curly brackets).
 	MinMaskAttributeKeyLen = 3
 )
 
@@ -99,7 +99,7 @@ func NewStorageProperties(storageConfig config.StorageConfig) (StorageProperties
 // Optional prefix contains fields from mask that user has defined
 // (bucketID, subID, topicID, custom values) without year, month, day, hour.
 // Year, month, day, hour are concatenated to objectName also based on mask in this function.
-// If mask isn't defined default storage name will be used, and it is: year/month/day/hour
+// If mask isn't defined default storage name will be used, and it is: year/month/day/hour.
 func (storage *StorageProperties) GenerateBlobName(msg streamproc.Message) string {
 	currentTime := time.Now().UTC()
 	objectName := storage.OptionalPrefix
@@ -149,7 +149,7 @@ func GenerateMaskValuesFromMaskString(mask string) ([]MaskMember, []string, erro
 
 				continue
 			} else {
-				// found just an empty {} but can't use that as version key
+				// found just an empty {} but can't use that as version key.
 				return nil, nil, errors.New(log.GetEmptyMaskAttributeError(mask, paramNum+1))
 			}
 		}
@@ -209,7 +209,7 @@ func (storage *StorageProperties) GenerateAndValidateOptionalPrefixFromMask() (o
 			value, ok := storage.CustomValuesMap[lowerMaskParam]
 			if !ok {
 				errMsg := log.GetInvalidMaskError(maskParam.Key)
-				// additionally check if maybe the user misspelled the version format
+				// additionally check if maybe the user misspelled the version format.
 				if strings.Contains(lowerMaskParam, string(LeftAttributeSignal)) || strings.Contains(lowerMaskParam, string(RightAttributeSignal)) {
 					errMsg += ". Value contains } or { characters. Did you mean to apply versioning in a {myattributekey} format?"
 				}
@@ -245,7 +245,7 @@ func ValidateCustomValues(customValues string) (map[string]string, error) {
 }
 
 // GetCompletePath generates location metadata parameter which will be set in blob
-// objectPath is calculated with GenerateBlob() function and sent as input parameter to this function
+// objectPath is calculated with GenerateBlob() function and sent as input parameter to this function.
 func (storage *StorageProperties) GetCompletePath(objectPath string) (string, error) {
 	switch storage.Config.Type {
 	case config.WriterABS:
@@ -259,7 +259,7 @@ func (storage *StorageProperties) GetCompletePath(objectPath string) (string, er
 	return "", &common.FatalError{errors.New("storage type not supported")}
 }
 
-// ContainsVersionKey checks if versioning is active
+// ContainsVersionKey checks if versioning is active.
 func (storage *StorageProperties) ContainsVersionKey() bool {
 	return len(storage.VersionKeys) > 0
 }

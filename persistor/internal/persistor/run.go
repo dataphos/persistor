@@ -63,10 +63,10 @@ func Run() {
 
 	srv := common.RunMetricsServer("persistor")
 
-	runCtx := graceful.WithSignalShutdown(context.Background()) // context for streamproc executor, will be canceled when a signal is sent
+	runCtx := graceful.WithSignalShutdown(context.Background()) // context for streamproc executor, will be canceled when a signal is sent.
 
 	go func() {
-		// when the context is canceled, wait for handler to clean up any messages still left inside
+		// when the context is canceled, wait for handler to clean up any messages still left inside.
 		<-runCtx.Done()
 		handler.End()
 	}()
@@ -82,9 +82,9 @@ func Run() {
 		RunBatchRecordIteratorHandler(runCtx, handler, persistorConfig.Reader.Kafka, persistorConfig.BatchSettings)
 	}
 
-	handler.Cancel() // to return from the goroutine calling End
+	handler.Cancel() // to return from the goroutine calling End.
 
-	// context used to stop metrics server
+	// context used to stop metrics server.
 	ctx, cancel := context.WithTimeout(context.Background(), common.ServerShutdownTimeout)
 	defer cancel()
 
@@ -155,7 +155,7 @@ func RunBatchRecordIteratorHandler(runCtx context.Context, handler streamproc.Ba
 }
 
 // DefineRunOptions specifies what happens for each error type and whether the run should continue (rough draft)
-// this will maybe depend on the broker being used
+// this will maybe depend on the broker being used.
 func DefineRunOptions() []streamproc.RunOption {
 	runOptions := []streamproc.RunOption{
 		streamproc.WithErrThreshold(50),

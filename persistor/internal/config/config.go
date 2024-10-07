@@ -14,7 +14,7 @@
 
 package config
 
-// Package config provides the config structs used in the entire persistor project
+// Package config provides the config structs used in the entire persistor project.
 
 import (
 	"crypto/tls"
@@ -41,9 +41,9 @@ type StorageConfig struct {
 	Prefix           string
 	MsgExtension     string
 	Mask             string
-	CustomValues     string // CustomValues allows user to define mask parameter aside predefined values
+	CustomValues     string // CustomValues allows user to define mask parameter aside predefined values.
 	Destination      string
-	StorageAccountID string // StorageAccountID used with ABS writer
+	StorageAccountID string // StorageAccountID used with ABS writer.
 	TopicID          string
 }
 
@@ -124,18 +124,18 @@ type TLSConfig struct {
 	CAFile   string
 }
 
-// BatchSettings represents the settings for batch processing
+// BatchSettings represents the settings for batch processing.
 type BatchSettings struct {
 	BatchSize int
-	// BatchTimeout maximum amount of time to wait for a batch to fill up to BatchSize before processing it anyway
+	// BatchTimeout maximum amount of time to wait for a batch to fill up to BatchSize before processing it anyway.
 	BatchTimeout time.Duration
-	// BatchMemory maximum amount of bytes allowed in a single batch
+	// BatchMemory maximum amount of bytes allowed in a single batch.
 	BatchMemory int
 }
 
 const Redacted = "[redacted]"
 
-// mapFromKeySequence when given a sequence of keys like ["k1, "k2"] will return baseMap["k1"]["k2"] is that value is a map
+// mapFromKeySequence when given a sequence of keys like ["k1, "k2"] will return baseMap["k1"]["k2"] is that value is a map.
 func mapFromKeySequence(baseMap map[string]interface{}, keys []string) *map[string]interface{} {
 	for _, k := range keys {
 		val, ok := baseMap[k]
@@ -154,15 +154,15 @@ func mapFromKeySequence(baseMap map[string]interface{}, keys []string) *map[stri
 	return &baseMap
 }
 
-// hideSensitiveConfigInfo removes service bus connection string from a config map so it doesn't get logged
+// hideSensitiveConfigInfo removes service bus connection string from a config map so it doesn't get logged.
 func hideSensitiveConfigInfo(configMap *map[string]interface{}) {
-	// hide reader connection string
+	// hide reader connection string.
 	if readerConfig := mapFromKeySequence(*configMap, []string{"Reader"}); readerConfig != nil && (*readerConfig)["Type"] == string(TypeServiceBus) {
 		if sbReaderConfig := mapFromKeySequence(*readerConfig, []string{"ServiceBus"}); sbReaderConfig != nil {
 			(*sbReaderConfig)["ConnectionString"] = Redacted
 		}
 	}
-	// hide sender connection string
+	// hide sender connection string.
 	if senderConfig := mapFromKeySequence(*configMap, []string{"Sender"}); senderConfig != nil && (*senderConfig)["Type"] == string(TypeServiceBus) {
 		if sbReaderConfig := mapFromKeySequence(*senderConfig, []string{"ServiceBus"}); sbReaderConfig != nil {
 			(*sbReaderConfig)["ConnectionString"] = Redacted
@@ -170,7 +170,7 @@ func hideSensitiveConfigInfo(configMap *map[string]interface{}) {
 	}
 }
 
-// configToLogFields takes a map obtained from a config structure and returns log.F to be logged in json format
+// configToLogFields takes a map obtained from a config structure and returns log.F to be logged in json format.
 func configToLogFields(configMap *map[string]interface{}) log.F {
 	hideSensitiveConfigInfo(configMap)
 
@@ -193,7 +193,7 @@ func configToMap(config any, configMap *map[string]interface{}) error {
 	return nil
 }
 
-// NewTLSConfig creates and returns a tls.Config if it is not enabled then the function returns nil
+// NewTLSConfig creates and returns a tls.Config if it is not enabled then the function returns nil.
 func NewTLSConfig(enabled bool, clientCertFile, clientKeyFile, caCertFile string) (*tls.Config, error) {
 	if !enabled {
 		return nil, nil
@@ -205,14 +205,14 @@ func NewTLSConfig(enabled bool, clientCertFile, clientKeyFile, caCertFile string
 
 	tlsConfig := tls.Config{MinVersion: tls.VersionTLS13}
 
-	// Load client cert
+	// Load client cert.
 	cert, err := tls.LoadX509KeyPair(clientCertFile, clientKeyFile)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load client certificate: %w", err)
 	}
 	tlsConfig.Certificates = []tls.Certificate{cert}
 
-	// Load CA cert
+	// Load CA cert.
 	caCert, err := os.ReadFile(caCertFile) // #nosec
 	if err != nil {
 		return nil, fmt.Errorf("failed to read CA certificate: %w", err)
@@ -224,7 +224,7 @@ func NewTLSConfig(enabled bool, clientCertFile, clientKeyFile, caCertFile string
 	return &tlsConfig, nil
 }
 
-// Log prints config to stdout with the help of the log package by setting the log.F fields equal to the config struct fields, and hides sensitive info
+// Log prints config to stdout with the help of the log package by setting the log.F fields equal to the config struct fields, and hides sensitive info.
 func (persistorConfig *PersistorConfig) Log() {
 	configMap := map[string]interface{}{}
 
@@ -238,7 +238,7 @@ func (persistorConfig *PersistorConfig) Log() {
 }
 
 // Log prints config to stdout with the help of the log package
-// by setting the log.F fields equal to the config struct fields, and hides sensitive info
+// by setting the log.F fields equal to the config struct fields, and hides sensitive info.
 func (indexerConfig *IndexerConfig) Log() {
 	configMap := map[string]interface{}{}
 

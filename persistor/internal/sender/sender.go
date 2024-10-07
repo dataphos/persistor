@@ -58,7 +58,7 @@ func SendToDeadLetter(ctx context.Context, errorCategory, errorSource, errorInfo
 		attrs := make(map[string]interface{}, len(msg.Attributes))
 
 		if msg.Attributes != nil {
-			// copying the map is necessary because otherwise we have concurrent reads and writes
+			// copying the map is necessary because otherwise we have concurrent reads and writes.
 			for k, v := range msg.Attributes {
 				attrs[k] = v
 			}
@@ -122,7 +122,7 @@ func SetMetadata(msg streamproc.Message, location string, topic string, position
 		msg.Attributes = map[string]interface{}{}
 	}
 	// put the user-defined attributes in one place; this changes the msg.Attributes
-	// reference and hopefully doesn't break anything on the broker lib side
+	// reference and hopefully doesn't break anything on the broker lib side.
 	msg.Attributes = map[string]interface{}{IndexExistingMetadata: msg.Attributes}
 	msg.Attributes[IndexLocationKey] = location
 	msg.Attributes[IndexLocationPosition] = fmt.Sprintf("%d", position)
@@ -138,7 +138,7 @@ func ParseMessage(msg streamproc.Message) (interface{}, error) {
 		index common.Data
 	)
 
-	// get user-defined attributes
+	// get user-defined attributes.
 	existingMetadataInterface, asserted := msg.Attributes["existing_metadata"].(map[string]interface{})
 	if !asserted {
 		return nil, fmt.Errorf("cannot parse metadata")
@@ -146,11 +146,11 @@ func ParseMessage(msg streamproc.Message) (interface{}, error) {
 
 	existingMetadata := onlyStrings(existingMetadataInterface)
 
-	// Business logic-related information. -- optional (will be empty strings if not set)
+	// Business logic-related information. -- optional (will be empty strings if not set).
 	index.BusinessSourceKey = existingMetadata[BusinessSourceKey]
 	index.BusinessObjectKey = existingMetadata[BusinessObjectKey]
 
-	// delete important keys from existing metadata - they are now members of the record itself
+	// delete important keys from existing metadata - they are now members of the record itself.
 	delete(existingMetadata, BusinessSourceKey)
 	delete(existingMetadata, BusinessObjectKey)
 
@@ -158,9 +158,9 @@ func ParseMessage(msg streamproc.Message) (interface{}, error) {
 		index.IndexSourceKey = fmt.Sprintf("%s_%s", index.BusinessSourceKey, index.BusinessObjectKey)
 	}
 	index.AdditionalMetadata = existingMetadata
-	generatedMetadata := onlyStrings(msg.Attributes) // get the generated metadata
+	generatedMetadata := onlyStrings(msg.Attributes) // get the generated metadata.
 
-	// Broker-related data. -- required
+	// Broker-related data. -- required.
 	brokerID, metadataExists := generatedMetadata["broker_id"]
 	if !metadataExists {
 		return nil, invalidIndex("broker_id")
@@ -173,14 +173,14 @@ func ParseMessage(msg streamproc.Message) (interface{}, error) {
 	index.OrderingKey = generatedMetadata["ordering_key"]
 
 	// Location of the message in relation to storage.
-	// Location key -- required
+	// Location key -- required.
 	locationKey, metadataExists := generatedMetadata["location_key"]
 	if !metadataExists {
 		return nil, invalidIndex("location_key")
 	}
 
 	index.Location.LocationKey = locationKey
-	// Location position -- optional
+	// Location position -- optional.
 	locationPosition, metadataExists := generatedMetadata["location_position"]
 	if metadataExists {
 		convertedPos, errConv := strconv.Atoi(locationPosition)
@@ -190,9 +190,9 @@ func ParseMessage(msg streamproc.Message) (interface{}, error) {
 	}
 
 	// Timestamp-related information.
-	// Publish time -- optional
+	// Publish time -- optional.
 	index.Timestamp.PublishTime = msg.PublishTime.UTC().Format(TimestampLayout)
-	// Ingestion time -- required
+	// Ingestion time -- required.
 	index.Timestamp.IngestionTime = msg.IngestionTime.UTC().Format(TimestampLayout)
 
 	return index, err
@@ -204,7 +204,7 @@ func invalidIndex(missingField string) error {
 }
 
 // onlyStrings returns a map of pairs from the original map whose values are strings and ignores the rest.
-// temporary until we decide on a nicer solution
+// temporary until we decide on a nicer solution.
 func onlyStrings(metadata map[string]interface{}) map[string]string {
 	result := make(map[string]string)
 

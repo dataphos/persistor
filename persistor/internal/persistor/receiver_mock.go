@@ -183,9 +183,9 @@ func (topic *FakeTopic) PublishRandomMessages(ctx context.Context, numMsgs int, 
 		attrs := map[string]interface{}{}
 
 		for iKey, key := range attributeKeys {
-			// skip this key for current message if probability is given
+			// skip this key for current message if probability is given.
 			if len(keyMissingProbs) > iKey && keyMissingProbs[iKey] > 0 {
-				//nolint:gosec // weakness of rng does not matter
+				//nolint:gosec // weakness of rng does not matter.
 				if rand.Float32() < keyMissingProbs[iKey] {
 					continue
 				}
@@ -193,7 +193,7 @@ func (topic *FakeTopic) PublishRandomMessages(ctx context.Context, numMsgs int, 
 			possibleValues := attributeValues[iKey]
 
 			if len(possibleValues) > 0 {
-				//nolint:gosec // weakness of rng does not matter
+				//nolint:gosec // weakness of rng does not matter.
 				attrs[key] = possibleValues[rand.Intn(len(possibleValues))]
 			}
 		}

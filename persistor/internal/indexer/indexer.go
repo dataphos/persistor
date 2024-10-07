@@ -53,7 +53,7 @@ func (indexer Indexer) HandleBatch(_ context.Context, messages []streamproc.Mess
 		common.UpdateFailureMetrics(failedMsgs...)
 
 		if indexer.deadLetterTopic != nil {
-			// send messages that can't be parsed to dead letter topic
+			// send messages that can't be parsed to dead letter topic.
 			err := sender.SendToDeadLetter(ctx, MessageParserErrorCategory, sender.DeadLetterSourceIndexer, loaderErr.Error(), indexer.deadLetterTopic, failedMsgs...) //nolint:contextcheck // using the handler context here that wasn't inherited from streamproc because we want the batch to finish processing if possible
 			if err != nil {
 				// for now if we can't send them to dead letter topic, ignore them. These messages were likely sent by accident and not by Persistor.
@@ -73,7 +73,7 @@ func (indexer Indexer) HandleBatch(_ context.Context, messages []streamproc.Mess
 
 		return nil // O.K.
 	} else if len(failedIndices) == 0 {
-		// we want to nack all messages, return the general error
+		// we want to nack all messages, return the general error.
 		common.UpdateFailureMetrics(parsedMessages...)
 	} else {
 		good, bad := MessagesGoodBad(parsedMessages, failedIndices)
@@ -82,11 +82,11 @@ func (indexer Indexer) HandleBatch(_ context.Context, messages []streamproc.Mess
 	}
 
 	log.Errorw("Mongo writer error", common.WriterError, log.F{log.ErrorFieldKey: err.Error()})
-	// for now assume nothing got stored in mongo
+	// for now assume nothing got stored in mongo.
 	if indexer.deadLetterTopic != nil {
 		dlErr := sender.SendToDeadLetter(ctx, MongoWriterErrorCategory, sender.DeadLetterSourceIndexer, err.Error(), indexer.deadLetterTopic, parsedMessages...) //nolint:contextcheck // using the handler context here that wasn't inherited from streamproc because we want the batch to finish processing if possible
 		if dlErr == nil {
-			return nil // sending to dead letter worked, no error
+			return nil // sending to dead letter worked, no error.
 		} else {
 			log.Errorw("Error sending failed messages to dead letter", common.SenderDeadLetterError, log.F{log.ErrorFieldKey: dlErr.Error()})
 
@@ -97,10 +97,10 @@ func (indexer Indexer) HandleBatch(_ context.Context, messages []streamproc.Mess
 	}
 
 	if len(parsedPositions) == len(messages) {
-		// no parsing errors, must reprocess everything
+		// no parsing errors, must reprocess everything.
 		return fmt.Errorf("indexing handler: %w", err)
 	}
-	// mark as failed only those messages which got parsed correctly
+	// mark as failed only those messages which got parsed correctly.
 	return &streamproc.PartiallyProcessedBatchError{
 		Failed: parsedPositions,
 		Err:    err,
@@ -126,6 +126,6 @@ func MessagesGoodBad(msgs []streamproc.Message, failed []int) (good []streamproc
 }
 
 func (indexer *Indexer) End() {
-	// when pull is canceled, allow handler to process any remaining batches if it has them
+	// when pull is canceled, allow handler to process any remaining batches if it has them.
 	<-indexer.handlerCtx.Done()
 }

@@ -35,9 +35,9 @@ func addMessageToVersionMap(versionMap map[string]interface{}, versions []string
 		mapOrBatchNumber, ok := innerMap[version]
 
 		if !ok {
-			// if the version doesn't already exist in the map, we need to add the message to a new mini-batch
+			// if the version doesn't already exist in the map, we need to add the message to a new mini-batch.
 			if keyPos == numVersions-1 {
-				// if this is the last version key to batch by, the mini-batch is made and its position is stored in the map
+				// if this is the last version key to batch by, the mini-batch is made and its position is stored in the map.
 				batch := []streamproc.Message{msg}
 				positionsInBatch := []int{msgNumber}
 
@@ -46,14 +46,14 @@ func addMessageToVersionMap(versionMap map[string]interface{}, versions []string
 
 				innerMap[version] = len(*batches) - 1
 			} else {
-				// if there are more version keys after this one, proceed to the last to be able to make a mini-batch
+				// if there are more version keys after this one, proceed to the last to be able to make a mini-batch.
 				newMap := map[string]interface{}{}
 
 				innerMap[version] = newMap
 				innerMap = newMap
 			}
 		} else {
-			// a mini-batch with the same version set already exists, add the message to it
+			// a mini-batch with the same version set already exists, add the message to it.
 			if batchNum, ok := mapOrBatchNumber.(int); ok {
 				batch, positionsInBatch := (*batches)[batchNum], (*messagePositions)[batchNum]
 
@@ -62,7 +62,7 @@ func addMessageToVersionMap(versionMap map[string]interface{}, versions []string
 			} else {
 				innerMap, castOk = mapOrBatchNumber.(map[string]interface{})
 				if !castOk {
-					log.Fatal(fmt.Sprintf("Unexpected internal batching error: was expecting a map of versions for the version at position %d", keyPos), common.ProcessError) // can't happen but just in case
+					log.Fatal(fmt.Sprintf("Unexpected internal batching error: was expecting a map of versions for the version at position %d", keyPos), common.ProcessError) // can't happen but just in case.
 				}
 			}
 		}
@@ -71,11 +71,11 @@ func addMessageToVersionMap(versionMap map[string]interface{}, versions []string
 
 // BatchByVersions splits the slice of messages into batches according to multiple message versions (values in message attributes that correspond to versionKeys).
 // it returns the batches and a slice of the same size which contains, for each batch, the message positions from the input slice.
-func BatchByVersions(messages []streamproc.Message, versionKeys []string) ([][]streamproc.Message, [][]int) { //nolint:gocritic // not naming these returns for now
-	// nolint:prealloc // would prealloc these slices to a specific length, but we don't know in advance how many batches there will be and besides, that's not a huge problem
-	var batchPointers []*[]streamproc.Message // slice of pointers to message batches where each batch has the same versions
-	// nolint:prealloc // same as above
-	var msgNumberPointers []*[]int // slice of pointers to lists of original message positions in each batch
+func BatchByVersions(messages []streamproc.Message, versionKeys []string) ([][]streamproc.Message, [][]int) { //nolint:gocritic // not naming these returns for now.
+	// nolint:prealloc // would prealloc these slices to a specific length, but we don't know in advance how many batches there will be and besides, that's not a huge problem.
+	var batchPointers []*[]streamproc.Message // slice of pointers to message batches where each batch has the same versions.
+	// nolint:prealloc // same as above.
+	var msgNumberPointers []*[]int // slice of pointers to lists of original message positions in each batch.
 
 	versionMap := map[string]interface{}{}
 
@@ -84,10 +84,10 @@ func BatchByVersions(messages []streamproc.Message, versionKeys []string) ([][]s
 		addMessageToVersionMap(versionMap, versions, msg, &batchPointers, msgNum, &msgNumberPointers)
 	}
 
-	// nolint:prealloc // same as above
-	var batches [][]streamproc.Message // slice of pointers to message batches where each batch has the same versions
-	// nolint:prealloc // same as above
-	var msgNumbers [][]int // slice of pointers to lists of original message positions in each batch
+	// nolint:prealloc // same as above.
+	var batches [][]streamproc.Message // slice of pointers to message batches where each batch has the same versions.
+	// nolint:prealloc // same as above.
+	var msgNumbers [][]int // slice of pointers to lists of original message positions in each batch.
 
 	for _, batch := range batchPointers {
 		batches = append(batches, *batch)

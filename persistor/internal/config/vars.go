@@ -16,7 +16,7 @@ package config
 
 // for setting environment variables
 // string value must follow the field structure in config for fig package to recognize it
-// values set from environment will override the corresponding fields from the toml file
+// values set from environment will override the corresponding fields from the toml file.
 const (
 	ReaderTypeKey                    = "READER_TYPE"
 	SenderTypeKey                    = "SENDER_TYPE"

@@ -17,15 +17,15 @@ package common
 // CalculateMessageSize determines the size of a message in bytes
 // for determining the size of attributes an approximation is used
 // the approximation considers only those fields whose values are of type []bytes or string since most brokers use that value standard
-// other value types are not considered in the size calculation
+// other value types are not considered in the size calculation.
 func CalculateMessageSize(data []byte, attributes map[string]interface{}) int {
 	messageSize := len(data)
 
 	for key, value := range attributes {
-		// Add the size of the key
+		// Add the size of the key.
 		messageSize += len(key)
 
-		// Add the size of the value
+		// Add the size of the value.
 		switch v := value.(type) {
 		case []byte:
 			messageSize += len(v)

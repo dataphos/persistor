@@ -34,13 +34,13 @@ type Location struct {
 	LocationPosition int    `json:"location_position,omitempty" bson:"location_position,omitempty"`
 }
 
-// StringTimestamps - Timestamps (string)
+// StringTimestamps - Timestamps (string).
 type StringTimestamps struct {
 	PublishTime   string `json:"publish_time" bson:"publish_time" validate:"omitempty,datetime=2006-01-02 15:04:05.99999999"`
 	IngestionTime string `json:"ingestion_time" bson:"ingestion_time" validate:"required,datetime=2006-01-02 15:04:05.999999999"`
 }
 
-// ProperTimestamps - Timestamps (as timestamps)
+// ProperTimestamps - Timestamps (as timestamps).
 type ProperTimestamps struct {
 	PublishTime          time.Time `json:"publish_time" bson:"publish_time"`
 	IngestionTime        time.Time `json:"ingestion_time" bson:"ingestion_time"`

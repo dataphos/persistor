@@ -47,7 +47,7 @@ func ValidateStorage(storage *StorageConfig, errorList *[]string) {
 	}
 }
 
-// ValidateGCSBucket checks does the bucket exist
+// ValidateGCSBucket checks does the bucket exist.
 func ValidateGCSBucket(bucketID string, errorList *[]string) {
 	ctx := context.Background()
 

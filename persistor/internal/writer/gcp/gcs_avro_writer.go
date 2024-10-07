@@ -26,7 +26,7 @@ import (
 	"github.com/dataphos/persistor/internal/common"
 )
 
-// GCSWriter used for basic message storing to buckets
+// GCSWriter used for basic message storing to buckets.
 type GCSWriter struct {
 	client storage.Client
 }
@@ -37,7 +37,7 @@ type GCSAvroWriter struct {
 	record common.AvroRecord
 }
 
-// Write stores a batch of messages with a given name to GCS in avro format
+// Write stores a batch of messages with a given name to GCS in avro format.
 func (writer *GCSAvroWriter) Write(ctx context.Context, bucketName string, objectName string, msgs ...streamproc.Message) *common.ProcError {
 	// Start with an empty byte array.
 	var bufBytes []byte
@@ -68,11 +68,10 @@ func (writer *GCSAvroWriter) Write(ctx context.Context, bucketName string, objec
 	return nil
 }
 
-// NewGCSWriter creates a writer based on the config
+// NewGCSWriter creates a writer based on the config.
 func NewGCSWriter() (*GCSWriter, error) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
-
 	if err != nil {
 		err = fmt.Errorf("GCS client initialization: %w", err)
 	}

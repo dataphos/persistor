@@ -44,7 +44,7 @@ func FormatData(record common.Data) (FormattedIndexerData, error) {
 
 	idxIngestionTime := time.Now().UTC()
 
-	// Assuming the timestamps are in the 'yyyy-mm-dd hh-mm-ss.mmmmmm' format (milliseconds are optional)
+	// Assuming the timestamps are in the 'yyyy-mm-dd hh-mm-ss.mmmmmm' format (milliseconds are optional).
 	publishTS, err = ParseTimestamp(record.Timestamp.PublishTime)
 	if err != nil {
 		return formData, err

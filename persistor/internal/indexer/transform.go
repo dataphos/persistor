@@ -41,7 +41,7 @@ func ObserveError(err error, errCode int, errorsMap map[string]*common.ProcError
 	}
 }
 
-// Validate validates the received indexer data
+// Validate validates the received indexer data.
 func Validate(validate *validator.Validate, idxData common.Data) error {
 	err := validate.Struct(idxData)
 	if err != nil {
@@ -81,12 +81,12 @@ func TransformMessage(msg streamproc.Message, val *validator.Validate) (loadedDa
 	return
 }
 
-// TransformToIndexerData transforms json of n messages into array of Messages succMsgs, loadedData, procErr, parsedPositions
+// TransformToIndexerData transforms json of n messages into array of Messages succMsgs, loadedData, procErr, parsedPositions.
 func (indexer *Indexer) TransformToIndexerData(ctx context.Context, msgs ...streamproc.Message) (goodMsgs []streamproc.Message, failedMsgs []streamproc.Message, loadedDataInterface []interface{}, procError *common.MessageBatchError, parsedPositions []int) {
 	records := make([]interface{}, len(msgs))
 	errors := make([]error, len(msgs))
 
-	// here we can accumulate errors so that they aren't logged for each message separately
+	// here we can accumulate errors so that they aren't logged for each message separately.
 	uniqueErrors := map[string]*common.ProcError{}
 
 	// parse the data into records, storing the record for each message
@@ -99,10 +99,10 @@ func (indexer *Indexer) TransformToIndexerData(ctx context.Context, msgs ...stre
 		return nil
 	})
 
-	// iterate over the records slice
+	// iterate over the records slice.
 	for iRec, record := range records {
 		err := errors[iRec]
-		// if no error, append the record to the return slice
+		// if no error, append the record to the return slice.
 		if err == nil {
 			loadedDataInterface = append(loadedDataInterface, record)
 			goodMsgs = append(goodMsgs, msgs[iRec])
