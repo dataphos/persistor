@@ -17,12 +17,14 @@ package persistor
 import (
 	"context"
 	"fmt"
-	"github.com/dataphos/lib-brokers/pkg/broker"
-	"github.com/pkg/errors"
 	"math/rand"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/pkg/errors"
+
+	"github.com/dataphos/lib-brokers/pkg/broker"
 )
 
 type FakeTopic struct {

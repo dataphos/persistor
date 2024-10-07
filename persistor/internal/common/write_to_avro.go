@@ -18,9 +18,10 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/dataphos/lib-streamproc/pkg/streamproc"
 	"github.com/hamba/avro/ocf"
 	"github.com/pkg/errors"
+
+	"github.com/dataphos/lib-streamproc/pkg/streamproc"
 )
 
 // AvroRecord is a generic help type used for managing Avro schemas.
