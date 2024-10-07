@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package servicebus contains servicebus logic for Resubmitter-API
+// Package servicebus contains servicebus logic for Resubmitter-API.
 package servicebus
 
 import (

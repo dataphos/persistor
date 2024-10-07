@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package indexer contains the logic for Resubmitter to communicate with Indexer
+// Package indexer contains the logic for Resubmitter to communicate with Indexer.
 package indexer
 
 import (

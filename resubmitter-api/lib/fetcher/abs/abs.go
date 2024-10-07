@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package abs contains the Azure Blob Storage logic for the fetcher component
+// Package abs contains the Azure Blob Storage logic for the fetcher component.
 package abs
 
 import (

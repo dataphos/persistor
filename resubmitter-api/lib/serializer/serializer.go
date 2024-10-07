@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package serializer contains the logic for serializing Persistor records
+// Package serializer contains the logic for serializing Persistor records.
 package serializer
 
 import (

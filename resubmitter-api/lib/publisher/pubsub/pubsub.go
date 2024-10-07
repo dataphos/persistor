@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pubsub contains pubsub logic for Resubmitter-API
+// Package pubsub contains pubsub logic for Resubmitter-API.
 package pubsub
 
 import (

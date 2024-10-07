@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package resubmitter contains the core Resubmitter logic
+// Package resubmitter contains the core Resubmitter logic.
 package resubmitter
 
 import (

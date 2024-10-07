@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package persistor contains necessary persistor structures
+// Package persistor contains necessary persistor structures.
 package persistor
 
 const (
