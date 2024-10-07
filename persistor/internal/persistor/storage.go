@@ -132,7 +132,7 @@ func GenerateMaskValuesFromMaskString(mask string) ([]MaskMember, []string, erro
 		paramLen := len(param)
 		// if param is empty then the user forgot something separated by or added an unneeded / character.
 		if paramLen == 0 {
-			return nil, nil, errors.New(log.GetEmptyMaskMemberError(mask, paramNum+1))
+			return nil, nil, errors.New(log.GetEmptyMaskMemberError(mask, paramNum+1)) //nolint:goerr113 // unnecessary here
 		}
 
 		member := MaskMember{}
@@ -150,7 +150,7 @@ func GenerateMaskValuesFromMaskString(mask string) ([]MaskMember, []string, erro
 				continue
 			} else {
 				// found just an empty {} but can't use that as version key.
-				return nil, nil, errors.New(log.GetEmptyMaskAttributeError(mask, paramNum+1))
+				return nil, nil, errors.New(log.GetEmptyMaskAttributeError(mask, paramNum+1)) //nolint:goerr113 // unnecessary here
 			}
 		}
 
@@ -214,7 +214,7 @@ func (storage *StorageProperties) GenerateAndValidateOptionalPrefixFromMask() (o
 					errMsg += ". Value contains } or { characters. Did you mean to apply versioning in a {myattributekey} format?"
 				}
 
-				return optionalPrefix, fmt.Errorf("storage config: %s", errMsg)
+				return optionalPrefix, fmt.Errorf("storage config: %s", errMsg) //nolint:goerr113 // unnecessary here
 			}
 
 			optionalPrefix = fmt.Sprintf("%s%s/", optionalPrefix, value)
@@ -223,6 +223,8 @@ func (storage *StorageProperties) GenerateAndValidateOptionalPrefixFromMask() (o
 
 	return optionalPrefix, nil
 }
+
+var ErrReadingCustomValues = errors.New("Error in reading custom values. Format of custom values should be like key1:value1,key2:value2 ")
 
 func ValidateCustomValues(customValues string) (map[string]string, error) {
 	customValuesMap := make(map[string]string)
@@ -235,7 +237,7 @@ func ValidateCustomValues(customValues string) (map[string]string, error) {
 	for _, param := range customValuesSplit {
 		temp := strings.Split(param, ":")
 		if len(temp) != 2 || temp[0] == "" || temp[1] == "" {
-			return customValuesMap, errors.New("Error in reading custom values. Format of custom values should be like key1:value1,key2:value2 ")
+			return customValuesMap, ErrReadingCustomValues
 		}
 
 		customValuesMap[strings.ToLower(strings.TrimSpace(temp[0]))] = strings.TrimSpace(temp[1])
@@ -243,6 +245,8 @@ func ValidateCustomValues(customValues string) (map[string]string, error) {
 
 	return customValuesMap, nil
 }
+
+var ErrStorageTypeNotSupported = errors.New("storage type not supported")
 
 // GetCompletePath generates location metadata parameter which will be set in blob
 // objectPath is calculated with GenerateBlob() function and sent as input parameter to this function.
@@ -256,7 +260,7 @@ func (storage *StorageProperties) GetCompletePath(objectPath string) (string, er
 	}
 
 	// config error which should be caught at initialization. Handling this properly anyway, just in case.
-	return "", &common.FatalError{errors.New("storage type not supported")}
+	return "", &common.FatalError{ErrStorageTypeNotSupported}
 }
 
 // ContainsVersionKey checks if versioning is active.

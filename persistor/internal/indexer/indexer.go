@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package indexer contains the logic for the Indexer component.
 package indexer
 
 import (
@@ -66,6 +67,7 @@ func (indexer Indexer) HandleBatch(_ context.Context, messages []streamproc.Mess
 	if len(parsedMessages) == 0 {
 		return nil
 	}
+
 	failedIndices, err := indexer.mongoWriter.Write(ctx, batch) //nolint:contextcheck // using the handler context here that wasn't inherited from streamproc because we want the batch to finish processing if possible
 
 	if err == nil {

@@ -17,8 +17,15 @@ package common
 // package common contains functionality needed by other modules.
 
 import (
+	"errors"
 	"fmt"
 	"os"
+)
+
+// Define static errors
+var (
+	ErrEnvVarNotSet      = errors.New("environment variable is not set")
+	ErrEnvVarValueNotSet = errors.New("value for environment variable was not found")
 )
 
 // GetEnvVariable represents a helper function which receives an environment variable
@@ -27,11 +34,13 @@ import (
 func GetEnvVariable(name string) (string, error) {
 	value, ok := os.LookupEnv(name)
 	if !ok {
-		return value, fmt.Errorf("environment variable '%s' is not set", name)
+		// Wrap the static error with the environment variable name
+		return "", fmt.Errorf("%w: '%s'", ErrEnvVarNotSet, name)
 	}
 
 	if value == "" {
-		return value, fmt.Errorf("value for '%s' was not found within the environment variables", name)
+		// Wrap the static error with the environment variable name
+		return "", fmt.Errorf("%w: '%s'", ErrEnvVarValueNotSet, name)
 	}
 
 	return value, nil

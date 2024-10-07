@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package gcp contains the code for the Google Cloud Storage avro writer.
 package gcp
 
 import (
@@ -51,6 +52,7 @@ func (writer *GCSAvroWriter) Write(ctx context.Context, bucketName string, objec
 		// given to the Avro Record.
 		return common.NewProcessingError(len(msgs), err, errCode)
 	}
+
 	bucketWriter := writer.client.Bucket(bucketName).Object(objectName).NewWriter(ctx)
 
 	if _, err = bucketWriter.Write(buf.Bytes()); err != nil {
@@ -71,6 +73,7 @@ func (writer *GCSAvroWriter) Write(ctx context.Context, bucketName string, objec
 // NewGCSWriter creates a writer based on the config.
 func NewGCSWriter() (*GCSWriter, error) {
 	ctx := context.Background()
+
 	client, err := storage.NewClient(ctx)
 	if err != nil {
 		err = fmt.Errorf("GCS client initialization: %w", err)

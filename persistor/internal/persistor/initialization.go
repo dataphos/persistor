@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package persistor contains the core Persistor logic.
 package persistor
 
 import (
@@ -27,11 +28,12 @@ import (
 func InitializePersistor(persistorConfig *config.PersistorConfig) (persistorHandler *Persistor, err error) {
 	persistorHandler = &Persistor{}
 	persistorHandler.HandlerCtx, persistorHandler.Cancel = context.WithCancel(context.Background())
-	storage, err := NewStorageProperties(persistorConfig.Storage)
 
+	storage, err := NewStorageProperties(persistorConfig.Storage)
 	if err != nil {
 		return
 	}
+
 	persistorHandler.Storage = storage
 
 	persistorHandler.IndexerEnabled, persistorHandler.DeadLetterActive = persistorConfig.IndexerEnabled, persistorConfig.DeadLetterEnabled
@@ -63,5 +65,5 @@ func InitializePersistor(persistorConfig *config.PersistorConfig) (persistorHand
 		}
 	}
 
-	return
+	return persistorHandler, err
 }

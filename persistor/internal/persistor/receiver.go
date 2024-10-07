@@ -42,6 +42,7 @@ func NewPubSubReceiver(ctx context.Context, config config.PubSubReceiverConfig, 
 	if batchSettings.BatchMemory > receiveSettings.MaxOutstandingBytes {
 		receiveSettings.MaxOutstandingBytes = batchSettings.BatchMemory
 	}
+
 	rec, err := pubsub.NewReceiver(ctx, receiverConfig, receiveSettings)
 
 	if err != nil {
@@ -53,6 +54,7 @@ func NewPubSubReceiver(ctx context.Context, config config.PubSubReceiverConfig, 
 			BatchSize:    batchSettings.BatchSize,
 			BatchTimeout: batchSettings.BatchTimeout,
 		},
+
 		brokerutil.IntoBatchedReceiverSettings{NumGoroutines: 1}), nil
 }
 

@@ -25,10 +25,11 @@ import (
 // addMessageToVersionMap puts the message into one of the batches or makes a new batch for it.
 // The index of the batch in the batches slice is stored in the versionMap recursively (the first version points to a map of second versions and so on)
 // msgNumber is appended to the integer slice at the same index in the messagePositions.
-// for example, if there are two versions and versionMap["v1"]["v2"] = 0 then all messages with versions (v1, v2) need to end up in the first mini-batch in the batches slice
+// for example, if there are two versions and versionMap["v1"]["v2"] = 0 then all messages with versions (v1, v2) need to end up in the first mini-batch in the batches slice.
 func addMessageToVersionMap(versionMap map[string]interface{}, versions []string, msg streamproc.Message, batches *[]*[]streamproc.Message, msgNumber int, messagePositions *[]*[]int) {
 	innerMap := versionMap
 	numVersions := len(versions)
+
 	var castOk bool
 
 	for keyPos, version := range versions {

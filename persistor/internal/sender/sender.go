@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package sender contains code for the Sender component of Persistor.
 package sender
 
 import (
@@ -83,13 +84,13 @@ func SendToDeadLetter(ctx context.Context, errorCategory, errorSource, errorInfo
 	return nil
 }
 
-func SendToIndexerTopic(ctx context.Context, idxTopic broker.Topic, messages []streamproc.Message, location, sourceTopicId string) *common.ProcError {
+func SendToIndexerTopic(ctx context.Context, idxTopic broker.Topic, messages []streamproc.Message, location, sourceTopicID string) *common.ProcError {
 	outbound := make([]broker.OutboundMessage, len(messages))
 
 	_ = batchproc.Parallel(ctx, len(messages), func(_ context.Context, start, end int) error {
 		for iMsg := start; iMsg < end; iMsg++ {
 			msg := messages[iMsg]
-			msgWithMetadata := SetMetadata(msg, location, sourceTopicId, iMsg)
+			msgWithMetadata := SetMetadata(msg, location, sourceTopicID, iMsg)
 
 			indexData, err := ParseMessage(msgWithMetadata)
 			if err != nil {
@@ -141,7 +142,7 @@ func ParseMessage(msg streamproc.Message) (interface{}, error) {
 	// get user-defined attributes.
 	existingMetadataInterface, asserted := msg.Attributes["existing_metadata"].(map[string]interface{})
 	if !asserted {
-		return nil, fmt.Errorf("cannot parse metadata")
+		return nil, fmt.Errorf("cannot parse metadata") //nolint:goerr113 //unnecessary here.
 	}
 
 	existingMetadata := onlyStrings(existingMetadataInterface)
@@ -157,6 +158,7 @@ func ParseMessage(msg streamproc.Message) (interface{}, error) {
 	if len(index.BusinessSourceKey) > 0 && len(index.BusinessObjectKey) > 0 {
 		index.IndexSourceKey = fmt.Sprintf("%s_%s", index.BusinessSourceKey, index.BusinessObjectKey)
 	}
+
 	index.AdditionalMetadata = existingMetadata
 	generatedMetadata := onlyStrings(msg.Attributes) // get the generated metadata.
 
@@ -198,9 +200,11 @@ func ParseMessage(msg streamproc.Message) (interface{}, error) {
 	return index, err
 }
 
+var ErrMissingIndexingField = errors.New("missing required indexing field in the message metadata")
+
 // InvalidIndex returns a formatted error message when a required field is missing from the message metadata.
 func invalidIndex(missingField string) error {
-	return fmt.Errorf("missing required indexing field in the message metadata: %s", missingField)
+	return fmt.Errorf("%w: %s", ErrMissingIndexingField, missingField)
 }
 
 // onlyStrings returns a map of pairs from the original map whose values are strings and ignores the rest.

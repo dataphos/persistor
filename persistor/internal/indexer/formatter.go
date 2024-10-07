@@ -77,6 +77,7 @@ func ParseTimestamp(str string) (time.Time, error) {
 	timestamp, err := time.Parse(layout, str)
 	if err != nil {
 		log.Warnw("Failed to parse timestamps!", log.F{log.ErrorFieldKey: err.Error()})
+
 		err = fmt.Errorf("parsing timestamp: %w", err)
 	}
 

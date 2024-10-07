@@ -17,6 +17,7 @@ package mongowriter
 // package mongowriter provides methods to write data to mongo.
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -35,28 +36,38 @@ type MongoConfig struct {
 	SessionTokenVal  string
 }
 
+var (
+	ErrMongoConnectionStringInvalid = errors.New("error validating mongo connection string")
+	ErrMongoConnectionFailed        = errors.New("error connecting to mongo")
+	ErrMongoPingFailed              = errors.New("can't ping mongo database")
+)
+
 func (mongoConfig *MongoConfig) Validate() error {
-	// Get the context.
+	// Get the context
 	ctx := context.Background()
 
-	// Set the URI used to connect to Mongo.
+	// Set the URI used to connect to Mongo
 	mongoClientOpts := options.Client().ApplyURI(mongoConfig.ConnectionString)
 
+	// Validate the Mongo client options
 	err := mongoClientOpts.Validate()
 	if err != nil {
-		return fmt.Errorf("error while validating mongo connection string: %s", mongoConfig.ConnectionString)
+		// Wrap the static error with the connection string for context
+		return fmt.Errorf("%w: '%s'", ErrMongoConnectionStringInvalid, mongoConfig.ConnectionString)
 	}
 
-	// Connect to Mongo.
+	// Connect to Mongo
 	client, err := mongo.Connect(ctx, mongoClientOpts)
 	if err != nil {
-		return fmt.Errorf("connecting to mongo: %w", err)
+		// Wrap the connection failure error
+		return fmt.Errorf("%w: %v", ErrMongoConnectionFailed, err)
 	}
 
-	// Verify that the client can connect to the deployment.
+	// Verify that the client can connect to the deployment (ping MongoDB)
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("error while validating the client, can't ping mongo database")
+		// Wrap the ping failure error
+		return fmt.Errorf("%w", ErrMongoPingFailed)
 	}
 
 	return nil

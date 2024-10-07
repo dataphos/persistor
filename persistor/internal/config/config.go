@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package config provides the config structs used in Persistor.
 package config
-
-// Package config provides the config structs used in the entire persistor project.
 
 import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -193,30 +193,40 @@ func configToMap(config any, configMap *map[string]interface{}) error {
 	return nil
 }
 
+var (
+	ErrEmptyCertFiles = errors.New("clientCertFile, clientKeyFile, and caCertFile cannot be empty")
+	ErrLoadClientCert = errors.New("failed to load client certificate")
+	ErrLoadCACert     = errors.New("failed to read CA certificate")
+)
+
 // NewTLSConfig creates and returns a tls.Config if it is not enabled then the function returns nil.
 func NewTLSConfig(enabled bool, clientCertFile, clientKeyFile, caCertFile string) (*tls.Config, error) {
 	if !enabled {
-		return nil, nil
+		// Return nil TLS config if TLS is not enabled.
+		return nil, nil //nolint:nilnil // fine here
 	}
 
 	if clientCertFile == "" || clientKeyFile == "" || caCertFile == "" {
-		return nil, fmt.Errorf("clientCertFile, clientKeyFile, and caCertFile cannot be empty")
+		// Return a static error for missing certificate files.
+		return nil, ErrEmptyCertFiles
 	}
 
 	tlsConfig := tls.Config{MinVersion: tls.VersionTLS13}
 
-	// Load client cert.
 	cert, err := tls.LoadX509KeyPair(clientCertFile, clientKeyFile)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load client certificate: %w", err)
+		// Wrap the error related to loading the client certificate.
+		return nil, fmt.Errorf("%w: clientCertFile='%s', clientKeyFile='%s'", ErrLoadClientCert, clientCertFile, clientKeyFile)
 	}
+
 	tlsConfig.Certificates = []tls.Certificate{cert}
 
-	// Load CA cert.
 	caCert, err := os.ReadFile(caCertFile) // #nosec
 	if err != nil {
-		return nil, fmt.Errorf("failed to read CA certificate: %w", err)
+		// Wrap the error related to loading the CA certificate.
+		return nil, fmt.Errorf("%w: caCertFile='%s'", ErrLoadCACert, caCertFile)
 	}
+
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
 	tlsConfig.RootCAs = caCertPool

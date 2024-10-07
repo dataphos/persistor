@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
-Package log contains the wrapper used for interacting with lib-remora,
-allowing for easier integration with existing codebase.
-
-All that needs to be done is:
-
-	import "github.com/dataphos/persistor/internal/common/log"
-
-And then to log one can just call the methods from the 'log' module directly. For example:
-
-	log.Info(...)
-
-*/
-
+// Package log contains the wrapper used for interacting with lib-logger,
+// allowing for easier integration with the existing codebase.
+//
+// All that needs to be done is:
+//
+//	import "github.com/dataphos/persistor/internal/common/log"
+//
+// And then to log one can just call the methods from the 'log' module directly.
+// For example:
+//
+//	log.Info(...)
 package log
 
 import (

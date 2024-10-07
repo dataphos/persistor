@@ -17,6 +17,7 @@ package sender
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 
 	"github.com/dataphos/lib-brokers/pkg/broker"
@@ -28,6 +29,7 @@ import (
 
 func NewTopic(ctx context.Context, senderConfig config.SenderConfig, topicID string, batchSize, batchBytes int) (topic broker.Topic, tolerateDeadLetterErrors bool, err error) {
 	var publisher broker.Publisher
+
 	tolerateDeadLetterErrors = true
 
 	switch senderConfig.Type {
@@ -54,8 +56,10 @@ func NewTopic(ctx context.Context, senderConfig config.SenderConfig, topicID str
 
 		var tlsConfig *tls.Config
 
+		var ErrTLSSenderConfigInitialization = errors.New("TLS sender config initialization failed")
+
 		if tlsConfig, err = config.NewTLSConfig(senderConfig.Kafka.TLSConfig.Enabled, senderConfig.Kafka.TLSConfig.CertFile, senderConfig.Kafka.TLSConfig.KeyFile, senderConfig.Kafka.TLSConfig.CAFile); err != nil {
-			return nil, false, fmt.Errorf("tls sender config initialization: %w", err)
+			return nil, false, fmt.Errorf("%w: %v", ErrTLSSenderConfigInitialization, err)
 		}
 
 		publisher, err = kafka.NewPublisher(

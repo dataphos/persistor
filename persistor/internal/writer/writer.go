@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package writer contains code for Persistor's writer component.
 package writer
 
 import (
@@ -21,12 +22,12 @@ import (
 	"github.com/dataphos/persistor/internal/common"
 )
 
-// BlobWriter is a blob storage writer that writes message batches to blobs
+// BlobWriter is a blob storage writer that writes message batches to blobs.
 type BlobWriter interface {
 	Write(ctx context.Context, bucketName string, objectName string, msgs ...streamproc.Message) *common.ProcError
 }
 
-// RecordWriter is a database writer for message metadata
+// RecordWriter is a database writer for message metadata.
 type RecordWriter interface {
 	Write(ctx context.Context, buffer []interface{}) ([]int, error)
 }

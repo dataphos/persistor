@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package mongowriter contains code necessary to define and use a mongowriter in Persistor.
 package mongowriter
 
 import (

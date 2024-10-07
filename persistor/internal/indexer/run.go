@@ -52,6 +52,7 @@ func Run() {
 
 		return
 	}
+
 	ctx := context.Background()
 	handler, err := InitializeIndexer(ctx, indexerConfig)
 
@@ -62,9 +63,10 @@ func Run() {
 
 		return
 	}
+
 	srv := common.RunMetricsServer("indexer")
 
-	runCtx := graceful.WithSignalShutdown(context.Background()) // context for streamproc executor, will be canceled when a signal is sent
+	runCtx := graceful.WithSignalShutdown(context.Background()) // context for streamproc executor, will be canceled when a signal is sent.
 
 	go func() {
 		// when the context is canceled, wait for handler to clean up any messages still left inside.

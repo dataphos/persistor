@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package azure contains the code for the Azure Blob Storage avro writer.
 package azure
 
 import (

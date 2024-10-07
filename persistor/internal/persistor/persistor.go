@@ -69,6 +69,7 @@ func (p *Persistor) MiniBatchProcessor(ctx context.Context, batchPos int, batch 
 	location, locationErr := p.Storage.GetCompletePath(objectName)
 	if locationErr != nil {
 		common.UpdateFailureMetrics(batch...)
+
 		parallelErrors[batchPos] = locationErr
 
 		return
@@ -96,6 +97,7 @@ func (p *Persistor) HandleBatch(_ context.Context, messages []streamproc.Message
 	if len(messages) == 0 {
 		return nil
 	}
+
 	var (
 		miniBatchToBatchIndices [][]int        // the nth position holds a list of indices of messages belonging to the nth mini batch.
 		failedIndices           []int          // an array that accumulates the position of all failed messages.
@@ -127,6 +129,7 @@ func (p *Persistor) HandleBatch(_ context.Context, messages []streamproc.Message
 	processorGroup.Wait()
 
 	var batchErrors []*common.ProcError
+
 	fatal := false
 
 	for iErr, err := range parallelErrors {

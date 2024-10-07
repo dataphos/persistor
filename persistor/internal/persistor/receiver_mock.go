@@ -74,6 +74,7 @@ func (topic *PublisherFakeTopic) Publish(ctx context.Context, msg broker.Outboun
 
 		return errors.New("pretend sender failed")
 	}
+
 	idSize := 20
 	randID := make([]byte, idSize)
 
@@ -190,6 +191,7 @@ func (topic *FakeTopic) PublishRandomMessages(ctx context.Context, numMsgs int, 
 					continue
 				}
 			}
+
 			possibleValues := attributeValues[iKey]
 
 			if len(possibleValues) > 0 {
@@ -197,7 +199,9 @@ func (topic *FakeTopic) PublishRandomMessages(ctx context.Context, numMsgs int, 
 				attrs[key] = possibleValues[rand.Intn(len(possibleValues))]
 			}
 		}
+
 		id := strconv.Itoa(len(topic.AllSent))
+
 		msg := broker.Message{
 			ID:            id,
 			Key:           "",
