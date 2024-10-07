@@ -43,12 +43,17 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GO_VERSION }}
+          # Add all component folders for monorepos
+          cache-dependency-path: |
+            ./persistor/go.sum
+            ./resubmitter-api/go.sum
+            ./indexer-api/go.sum
 
       - name: Install NWA tool
         run: go install github.com/B1NARY-GR0UP/nwa@latest
 
       - name: Add missing license headers
-        run: nwa add -c "Syntio Ltd." # WRITE FOLDER PATHS FOR ALL FOLDERS THAT CONTAIN FILES THAT REQUIRE HEADERS eg. ./persistor
+        run: nwa add -c "Syntio Ltd." ./persistor ./indexer-api ./resubmitter-api
 
       - name: Check and Commit changes
         id: check_commit
@@ -87,8 +92,14 @@ jobs:
     strategy:
       matrix:
         component:
-          - dockerfile-path: # Add dockerfile path eg. './persistor/docker/persistor/Dockerfile'
-            image-name: # Add image name eg. 'persistor-core'
+          - dockerfile-path: ./persistor/docker/persistor/Dockerfile
+            image-name: persistor-core
+          - dockerfile-path: ./persistor/docker/indexer/Dockerfile
+            image-name: persistor-indexer
+          - dockerfile-path: ./indexer-api/Dockerfile
+            image-name: persistor-indexer-api
+          - dockerfile-path: ./resubmitter-api/Dockerfile
+            image-name: persistor-resubmitter
 
     steps:
       - name: Check out code
