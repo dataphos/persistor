@@ -27,7 +27,10 @@ import (
 	"github.com/dataphos/persistor/internal/config"
 )
 
-var ErrSenderTypeNotRecognized = errors.New("sender type not recognized")
+var (
+	ErrSenderTypeNotRecognized       = errors.New("sender type not recognized")
+	ErrTLSSenderConfigInitialization = errors.New("TLS sender config initialization failed")
+)
 
 func NewTopic(ctx context.Context, senderConfig config.SenderConfig, topicID string, batchSize, batchBytes int) (topic broker.Topic, tolerateDeadLetterErrors bool, err error) {
 	var publisher broker.Publisher
@@ -57,8 +60,6 @@ func NewTopic(ctx context.Context, senderConfig config.SenderConfig, topicID str
 		producerSettings.BatchBytes = int64(batchBytes)
 
 		var tlsConfig *tls.Config
-
-		ErrTLSSenderConfigInitialization := errors.New("TLS sender config initialization failed")
 
 		if tlsConfig, err = config.NewTLSConfig(senderConfig.Kafka.TLSConfig.Enabled, senderConfig.Kafka.TLSConfig.CertFile, senderConfig.Kafka.TLSConfig.KeyFile, senderConfig.Kafka.TLSConfig.CAFile); err != nil {
 			return nil, false, fmt.Errorf("%w: %v", ErrTLSSenderConfigInitialization, err)
