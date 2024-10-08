@@ -75,8 +75,8 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 
 	var tlsConfig *tls.Config
 
-	if useTlsStr := os.Getenv(tlsEnabledEnvKey); useTlsStr != "" {
-		tlsEnabled, err := strconv.ParseBool(useTlsStr)
+	if useTLSStr := os.Getenv(tlsEnabledEnvKey); useTLSStr != "" {
+		tlsEnabled, err := strconv.ParseBool(useTLSStr)
 		if err != nil {
 			return kafka.ProducerConfig{}, err
 		}
@@ -134,6 +134,7 @@ func LoadProducerConfigFromEnv() (kafka.ProducerConfig, error) {
 			if SASLPassword == "" {
 				return kafka.ProducerConfig{}, log.EnvVariableNotDefined(SASLPassword)
 			}
+
 			saslConfig = &kafka.PlainSASLConfig{
 				User: SASLUsername,
 				Pass: SASLPassword,

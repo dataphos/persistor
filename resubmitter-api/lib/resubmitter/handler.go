@@ -85,6 +85,7 @@ func (handler *Handler) ResubmitIds(context *gin.Context) {
 			"msg":   OnBadRequestMessage,
 			"error": err.Error(),
 		})
+
 		return
 	}
 
@@ -93,6 +94,7 @@ func (handler *Handler) ResubmitIds(context *gin.Context) {
 	results := handler.resubmitterJob.Resubmit(topicID, mongoCollection, body.Ids)
 
 	statusCode := chooseHTTPStatusCode(handler.resubmitterJob, results)
+
 	context.JSON(statusCode, &response{
 		Status:  statusCode,
 		Msg:     chooseResponseMessage(statusCode),
@@ -159,6 +161,7 @@ func (handler *Handler) ResubmitInterval(context *gin.Context) {
 	err := context.BindJSON(&body)
 	if err != nil {
 		err = fmt.Errorf("error occurred during binding JSON to request body: %w", err)
+
 		context.JSON(http.StatusBadRequest, gin.H{
 			"msg":   OnBadRequestMessage,
 			"error": err.Error(),
@@ -174,6 +177,7 @@ func (handler *Handler) ResubmitInterval(context *gin.Context) {
 	results := handler.resubmitterJob.ResubmitInterval(topicID, mongoCollection, body.BrokerID, *body.LowerBound, *body.UpperBound)
 
 	statusCode := chooseHTTPStatusCode(handler.resubmitterJob, results)
+
 	context.JSON(statusCode, &response{
 		Status:  statusCode,
 		Msg:     chooseResponseMessage(statusCode),

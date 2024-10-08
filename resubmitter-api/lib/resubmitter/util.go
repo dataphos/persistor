@@ -84,7 +84,7 @@ func packageMetadata(message *indexer.Message) map[string]string {
 func tagAsFailures(messages []indexer.Message, reason string, errc chan<- PipelineError) {
 	for _, message := range messages {
 		errc <- PipelineError{
-			Id:     message.UniqueID,
+			ID:     message.UniqueID,
 			Reason: reason,
 		}
 	}

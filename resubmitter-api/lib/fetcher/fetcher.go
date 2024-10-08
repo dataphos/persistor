@@ -17,8 +17,9 @@ package fetcher
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"io"
+
+	"github.com/pkg/errors"
 )
 
 type Fetcher interface {

@@ -17,13 +17,14 @@ package resubmitter
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/dataphos/persistor-resubmitter-api/common/errcodes"
 	"github.com/dataphos/persistor-resubmitter-api/common/log"
 	"github.com/dataphos/persistor-resubmitter-api/common/util"
 	"github.com/dataphos/persistor-resubmitter-api/lib/indexer"
 	"github.com/dataphos/persistor-resubmitter-api/lib/persistor"
-	"sync"
-	"time"
 )
 
 const (
@@ -149,7 +150,7 @@ func (resubmitterJob *resubmitterJob) ResubmitInterval(topicID, mongoCollection,
 	})
 }
 
-func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, brokerID string, from, to time.Time) (<-chan []indexer.Message, <-chan IndexerError) {
+func (resubmitterJob *resubmitterJob) batchesFromInterval(mongoCollection, brokerID string, from, to time.Time) (<-chan []indexer.Message, <-chan IndexerError) { //nolint:varnamelen // makes sense
 	batches := make(chan []indexer.Message, 1)
 	errc := make(chan IndexerError)
 
@@ -397,7 +398,7 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicID strin
 		if err != nil {
 			log.Debug(err.Error(), errcodes.Publisher)
 			errc <- PipelineError{
-				Id:     record.ID,
+				ID:     record.ID,
 				Reason: "publish_error",
 			}
 		} else {
@@ -446,6 +447,7 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicID strin
 					}
 				}()
 			}
+
 			waitGroup.Wait()
 		}
 	}()

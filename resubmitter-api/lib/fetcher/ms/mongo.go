@@ -119,7 +119,7 @@ type mongoReadCloser struct {
 	pos          int
 }
 
-func (rc *mongoReadCloser) Read(p []byte) (int, error) {
+func (rc *mongoReadCloser) Read(buffer []byte) (int, error) {
 	if rc.data == nil {
 		var document MongoRecord
 
@@ -139,7 +139,7 @@ func (rc *mongoReadCloser) Read(p []byte) (int, error) {
 		return 0, io.EOF
 	}
 
-	n := copy(p, rc.data[rc.pos:])
+	n := copy(buffer, rc.data[rc.pos:])
 	rc.pos += n
 
 	return n, nil

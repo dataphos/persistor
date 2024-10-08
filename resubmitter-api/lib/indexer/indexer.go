@@ -221,7 +221,7 @@ const (
 	Limit  = "limit"
 	Offset = "offset"
 	From   = "from"
-	To     = "to"
+	To     = "to" //nolint:varnamelen // makes sense
 
 	DateFormat = "2006-01-02T15:04:05.99999999Z"
 )

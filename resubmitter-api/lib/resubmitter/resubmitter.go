@@ -137,7 +137,7 @@ type IndexerError struct {
 }
 
 type PipelineError struct {
-	Id     string `json:"id"`
+	ID     string `json:"id"`
 	Reason string `json:"reason"`
 }
 
