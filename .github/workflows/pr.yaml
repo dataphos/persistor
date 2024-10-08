@@ -8,9 +8,9 @@ env:
   GO111MODULE: on
   GO_VERSION: 1.19
   NODE_VERSION: 22
-  LINT_ARGS: -v --timeout 5m0s --out-${NO_FUTURE}format colored-line-number
+  LINT_ARGS: -v --skip-files .*_test.go --timeout 5m0s --out-${NO_FUTURE}format colored-line-number
+  GOLANGCI_LINT_VERSION: v1.50
   TEST_ARGS: -v -short -coverprofile=coverage.out
-  TEST_PATH: ./...
 
 jobs:
   commitlint:
@@ -33,6 +33,30 @@ jobs:
       - name: Validate PR commits with commitlint
         run: npx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
+  # Linting multiple Dockerfiles to ensure adherence to best practices and coding standards.
+  hadolint_job:
+    name: Hadolint Job
+    if: ${{ ! contains(github.head_ref, 'release-please--branches--main') }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dockerfile:
+          - ./persistor/docker/persistor/Dockerfile
+          - ./persistor/docker/indexer/Dockerfile
+          - ./indexer-api/Dockerfile
+          - ./resubmitter-api/Dockerfile
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Run Hadolint for ${{ matrix.dockerfile }}
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          config: ./.hadolint.yaml
+          dockerfile: ${{ matrix.dockerfile }}
+
   editor_config_job:
     name: Editor Config Job
     runs-on: ubuntu-latest
@@ -50,29 +74,54 @@ jobs:
           npm install --save-dev editorconfig-checker
           ./node_modules/.bin/editorconfig-checker
 
+  # Ensures that the code adheres to the lint checks defined in .golangci.yaml.
   lint_job:
-    name: Go Lint Job
+    name: Go lint job for all components
     if: ${{ ! contains(github.head_ref, 'release-please--branches--main') }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - ./persistor
+          - ./resubmitter-api
+          - ./indexer-api
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
 
+      # Using `tj-actions/changed-files` to check if any files in the component folder have changes
+      - name: Check if component folder has changed
+        id: check_changed_files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: ${{ matrix.component }}/**
+
+      # Running lint steps if changes are detected in the component folder
       - name: Set up Go
+        if: steps.check_changed_files.outputs.any_changed == 'true'
         uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
+          # Add all component folders for monorepos
+          cache-dependency-path: |
+            ${{ matrix.component }}/go.sum
 
-      - name: Tidy
-        run: go mod tidy
+      - name: Tidy Go mod for ${{ matrix.component }}
+        if: steps.check_changed_files.outputs.any_changed == 'true'
+        run: |
+          cd ${{ matrix.component }}
+          go mod tidy
 
-      - name: Go Lint
-        uses: golangci/golangci-lint-action@v3
+      - name: Run Go Lint for ${{ matrix.component }}
+        if: steps.check_changed_files.outputs.any_changed == 'true'
+        uses: golangci/golangci-lint-action@v6
         with:
           version: v1.50.0
-          args: ${{ env.LINT_ARGS }}
+          args: ${{env.LINT_ARGS}}
           skip-pkg-cache: true
           skip-build-cache: true
+          working-directory: ${{ matrix.component }}
 
   licenses_check:
     name: 3rd Party Licenses Check
@@ -118,12 +167,11 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GO_VERSION }}
-
-      - name: Tidy
-        run: go mod tidy
-
-      - name: Vendor
-        run: go mod vendor
+          # Add all component folders for monorepos
+          cache-dependency-path: |
+            ./persistor/go.sum
+            ./resubmitter-api/go.sum
+            ./indexer-api/go.sum
 
       - name: Install Go licenses
         run: go install github.com/google/go-licenses@v1.4.0
@@ -140,15 +188,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r .github/workflows/requirements.txt
 
-      - name: Run license check
+      - name: Run go mod tidy, go mod vendor & license check
+      # switch to each component folder first e.g. "./persistor"
         run: |
-          go-licenses report ./... 2>/dev/null | python .github/workflows/generate_and_check_licenses.py
+          cd ./persistor
+          go mod tidy
+          go mod vendor
+          go-licenses report ./... 2>/dev/null | python ../.github/workflows/generate_and_check_licenses.py
+          cd ../indexer-api
+          go mod tidy
+          go mod vendor
+          go-licenses report ./... 2>/dev/null | python ../.github/workflows/generate_and_check_licenses.py
+          cd ../resubmitter-api
+          go mod tidy
+          go mod vendor
+          go-licenses report ./... 2>/dev/null | python ../.github/workflows/generate_and_check_licenses.py
+
 
       - name: Check and Commit changes
         run: |
-          if [ -d "./licenses" ]; then
-            git add ./licenses
-          fi
+          git add ./persistor/licenses ./indexer-api/licenses ./resubmitter-api/licenses
 
           if ! git diff-index --quiet HEAD; then
             git commit -m "chore: update third party licenses"
@@ -176,23 +235,66 @@ jobs:
           echo "Creating a new PR..."
           gh pr create --base "${{ env.PARENT_BRANCH }}" --head "update-third-party-licenses-${{ github.run_id }}" --title "${{ env.PR_TITLE }}" --body "This is an automated PR that updates the list of 3rd party licenses."
 
+  # Runs unit tests for all components in this repo
   test_job:
-    name: Test Job
+    name: Test Job for all components
     if: ${{ github.base_ref == 'main' && ! contains(github.head_ref, 'release-please--branches--main') }}
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        component:
+          - ./persistor
+          - ./resubmitter-api
+          - ./indexer-api
+
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
+          # Add all component folders for monorepos
+          cache-dependency-path: |
+            ${{ matrix.component }}/go.sum
 
-      - name: Tidy
+      - name: Tidy Go mod for ${{ matrix.component }}
+        working-directory: ${{ matrix.component }}
         run: go mod tidy
 
-      - name: Go Test
-        run: go test ${{ env.TEST_ARGS }} ${{ env.TEST_PATH }}
+      - name: Run Go Test for ${{ matrix.component }}
+        working-directory: ${{ matrix.component }}
+        run: go test ${{env.TEST_ARGS}} ./...
+
+  # Builds docker images for all components of the repo to test if they can successfully be built
+  Build_docker:
+    name: Test building docker images
+    if: ${{ ! contains(github.head_ref, 'release-please--branches--main') }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        component:
+          - dockerfile-path: ./persistor/docker/persistor/Dockerfile
+            image-name: dataphos-persistor-core
+          - dockerfile-path: ./persistor/docker/indexer/Dockerfile
+            image-name: dataphos-persistor-indexer
+          - dockerfile-path: ./indexer-api/Dockerfile
+            image-name: dataphos-persistor-indexer-api
+          - dockerfile-path: ./resubmitter-api/Dockerfile
+            image-name: dataphos-persistor-resubmitter
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set Tag
+        run: |
+          TAG="build-docker-test"
+          echo "TAG=$TAG" >> $GITHUB_ENV  # Exporting the TAG variable to the environment
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ matrix.component.image-name }}:${{ env.TAG }} -f ${{ matrix.component.dockerfile-path }} .

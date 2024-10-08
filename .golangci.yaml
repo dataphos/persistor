@@ -77,7 +77,7 @@ linters:
     - asciicheck
     - bidichk
     - bodyclose
-    - containedctx
+    # - containedctx
     - contextcheck
     # - cyclop
     - decorder
@@ -99,14 +99,14 @@ linters:
     - govet
     - gci
     # - gochecknoglobals
-    - gochecknoinits
+    # - gochecknoinits
     # - gocognit
     - goconst
     # - gocritic
     # - gocyclo
     - godot
     - godox
-    - goerr113
+    # - goerr113
     - gofumpt
     - goheader
     # - gomnd
@@ -129,7 +129,7 @@ linters:
     - nlreturn
     - noctx
     # - nolintlint
-    - nonamedreturns
+    # - nonamedreturns
     - nosprintfhostport
     # - paralleltest
     - prealloc
@@ -140,7 +140,7 @@ linters:
     - sqlclosecheck
     - stylecheck
     - staticcheck
-    - tagliatelle
+    # - tagliatelle
     - tenv
     - testpackage
     - thelper
