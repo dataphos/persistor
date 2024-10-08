@@ -64,6 +64,7 @@ func newClient(storageName string) (*azblob.Client, error) {
 	}
 
 	url := fmt.Sprintf("%s%s%s", azureStorageProtocol, storageName, azureStorageSuffix)
+
 	client, err := azblob.NewClient(url, credential, nil)
 	if err != nil {
 		return nil, err
