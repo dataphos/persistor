@@ -100,6 +100,7 @@ func (l *lock) getLocker(key interface{}) *refCounter {
 
 	return res.(*refCounter) //nolint:forcetypeassert //fine here
 }
+
 func (l *lock) tryGetLocker(key interface{}) (*refCounter, bool) {
 	res, ok := l.inUse.Load(key)
 	return res.(*refCounter), ok //nolint:forcetypeassert //fine here

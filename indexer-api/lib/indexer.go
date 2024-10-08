@@ -76,7 +76,6 @@ func (indexer *Indexer) GetQueried(queryInfo repo.QueryInformation) (*Interval, 
 		context.Background(),
 		queryInfo.MongoCollection,
 		queryInfo.Filters)
-
 	if err != nil {
 		return nil, err
 	}

@@ -110,7 +110,6 @@ func extractIntervalQueryParams(context *gin.Context) (*intervalQueryParams, err
 		if from.After(now) {
 			return nil, fmt.Errorf("error during upper interval bound parsing: "+
 				"the given bound can't be in the future (current time: %v, given time:%v)", now, from)
-
 		}
 	}
 

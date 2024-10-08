@@ -16,11 +16,12 @@ package repo
 
 import (
 	"context"
+	"os"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
 )
 
 const (
@@ -103,14 +104,12 @@ func (repo *repo) Get(ctx context.Context, mongoCollection, id string, attribute
 		filter,
 		options.Find().SetProjection(projection),
 	)
-
 	if err != nil {
 		return nil, err
 	}
 
 	var messages []Message
 	err = cursor.All(ctx, &messages)
-
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +136,6 @@ func (repo *repo) GetAll(ctx context.Context, mongoCollection string, ids, attri
 		filter,
 		options.Find().SetProjection(projection),
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +175,6 @@ func (repo *repo) GetAllInInterval(ctx context.Context, mongoCollection string, 
 		options.Find().SetLimit(int64(limit)),
 		options.Find().SetSkip(int64(offset)),
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +223,6 @@ func (repo *repo) GetQueried(ctx context.Context, queryInfo QueryInformation) ([
 		options.Find().SetLimit(int64(queryInfo.Limit)),
 		options.Find().SetSkip(int64(queryInfo.Offset)),
 	)
-
 	if err != nil {
 		return nil, err
 	}

@@ -41,32 +41,42 @@ var logLevels = map[string]logger.Level{
 	errorLevel: logger.LevelError,
 }
 
-type F = logger.F
-type L = logger.L
+type (
+	F = logger.F
+	L = logger.L
+)
 
-type NoErrorCodeWithoutFields func(string)
-type NoErrorCodeWithFields func(string, F)
-type WithErrorCodeWithoutFields func(string, uint64)
-type WithErrorCodeWithFields func(string, uint64, F)
+type (
+	NoErrorCodeWithoutFields   func(string)
+	NoErrorCodeWithFields      func(string, F)
+	WithErrorCodeWithoutFields func(string, uint64)
+	WithErrorCodeWithFields    func(string, uint64, F)
+)
 
-var Close func()
-var Flush func()
+var (
+	Close func()
+	Flush func()
+)
 
 var log logger.Log
 
-var Info NoErrorCodeWithoutFields
-var Warn NoErrorCodeWithoutFields
-var Error WithErrorCodeWithoutFields
-var Fatal WithErrorCodeWithoutFields
-var Panic WithErrorCodeWithoutFields
-var Debug WithErrorCodeWithoutFields
+var (
+	Info  NoErrorCodeWithoutFields
+	Warn  NoErrorCodeWithoutFields
+	Error WithErrorCodeWithoutFields
+	Fatal WithErrorCodeWithoutFields
+	Panic WithErrorCodeWithoutFields
+	Debug WithErrorCodeWithoutFields
+)
 
-var Infow NoErrorCodeWithFields
-var Warnw NoErrorCodeWithFields
-var Errorw WithErrorCodeWithFields
-var Fatalw WithErrorCodeWithFields
-var Panicw WithErrorCodeWithFields
-var Debugw WithErrorCodeWithFields
+var (
+	Infow  NoErrorCodeWithFields
+	Warnw  NoErrorCodeWithFields
+	Errorw WithErrorCodeWithFields
+	Fatalw WithErrorCodeWithFields
+	Panicw WithErrorCodeWithFields
+	Debugw WithErrorCodeWithFields
+)
 
 var PanicLogger func()
 
