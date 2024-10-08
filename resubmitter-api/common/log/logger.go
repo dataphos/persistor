@@ -110,6 +110,7 @@ func getMinimumLogLevel() (logger.Level, *string) {
 	levelString, exists := os.LookupEnv(minimumLogLevelEnv)
 	if !exists {
 		initWarnMsg = UsingDefaultParameterValue(minimumLogLevelEnv, defaultMinimumLogLevel)
+
 		return logLevels[defaultMinimumLogLevel], &initWarnMsg
 	}
 
@@ -117,6 +118,7 @@ func getMinimumLogLevel() (logger.Level, *string) {
 	if !supported {
 		initWarnMsg = fmt.Sprintf("Value %v for %v is not supported, using %v",
 			levelString, minimumLogLevelEnv, defaultMinimumLogLevel)
+
 		return logLevels[defaultMinimumLogLevel], &initWarnMsg
 	}
 

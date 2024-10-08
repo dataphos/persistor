@@ -226,7 +226,7 @@ const (
 	DateFormat = "2006-01-02T15:04:05.99999999Z"
 )
 
-func (indexer *indexer) constructGetByIntervalAndBrokerIDURL(mongoCollection, brokerID string, from, to time.Time, limit, offset int) string {
+func (indexer *indexer) constructGetByIntervalAndBrokerIDURL(mongoCollection, brokerID string, from, to time.Time, limit, offset int) string { //nolint:varnamelen // makes sense
 	return fmt.Sprintf(
 		"%s%s%s/%s?%s=%s&%s=%s&%s=%v&%s=%v",
 		indexer.baseURL,
