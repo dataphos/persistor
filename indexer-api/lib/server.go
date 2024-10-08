@@ -91,6 +91,7 @@ func loadServerOptionsFromEnv() ([]ServerOption, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, log.ParsingEnvVariableFailed(tlsEnv))
 		}
+
 		serverOptions = append(serverOptions, WithTLS(tls))
 	}
 
@@ -99,6 +100,7 @@ func loadServerOptionsFromEnv() ([]ServerOption, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, log.ParsingEnvVariableFailed(readHeaderTimeoutEnv))
 		}
+
 		serverOptions = append(serverOptions, WithReadHeaderTimeout(timeout))
 	}
 
@@ -113,7 +115,9 @@ func Serve(handler *Handler, opts ...ServerOption) {
 	}
 
 	router := gin.Default()
+
 	var waitGroup sync.WaitGroup
+
 	registerIndexerEndpoints(handler, router, &waitGroup)
 
 	srv := &http.Server{

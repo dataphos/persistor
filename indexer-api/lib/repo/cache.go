@@ -83,6 +83,7 @@ func (cacheRepo *cached) GetAllInIntervalDocumentCount(ctx context.Context, mong
 	cacheRepo.mtx.RLock(key)
 	count, hit := cacheRepo.tryGetIntervalAndBrokerIDDocumentCount(key)
 	cacheRepo.mtx.RUnlock(key)
+
 	if hit {
 		return count, nil
 	}
@@ -109,6 +110,7 @@ func (cacheRepo *cached) tryGetIntervalAndBrokerIDDocumentCount(key string) (int
 	if hit {
 		return count.(int64), hit
 	}
+
 	return 0, hit
 }
 

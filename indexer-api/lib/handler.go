@@ -42,8 +42,10 @@ func (handler *Handler) GetUnique(context *gin.Context) {
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, &metadata)
 }
 
@@ -62,6 +64,7 @@ func (handler *Handler) GetAll(context *gin.Context) {
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
 
@@ -71,8 +74,10 @@ func (handler *Handler) GetAll(context *gin.Context) {
 			"message": OnFailureMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, &metadata)
 }
 
@@ -88,6 +93,7 @@ func (handler *Handler) GetAllInInterval(context *gin.Context) {
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
 	paginationParams := extractPaginationQueryParams(context)
@@ -98,8 +104,10 @@ func (handler *Handler) GetAllInInterval(context *gin.Context) {
 			"message": OnFailureMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, &metadata)
 }
 
@@ -113,12 +121,14 @@ func (handler *Handler) GetQueried(context *gin.Context) {
 	mongoCollection := context.Param("mongo_collection")
 
 	var body GetQueriedRequestBody
+
 	err := context.BindJSON(&body)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
 
@@ -128,6 +138,7 @@ func (handler *Handler) GetQueried(context *gin.Context) {
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
 
@@ -137,6 +148,7 @@ func (handler *Handler) GetQueried(context *gin.Context) {
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
 
@@ -150,13 +162,14 @@ func (handler *Handler) GetQueried(context *gin.Context) {
 	}
 
 	metadata, err := handler.indexer.GetQueried(queryInfo)
-
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"message": OnBadRequestMessage,
 			"error":   err.Error(),
 		})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, &metadata)
 }

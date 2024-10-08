@@ -85,6 +85,7 @@ func (l *lock) putBackInPool(key interface{}, m *refCounter) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 	atomic.AddInt64(&m.counter, -1)
+
 	if m.counter <= 0 {
 		l.pool.Put(m.lock)
 		l.inUse.Delete(key)

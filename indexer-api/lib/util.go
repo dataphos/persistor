@@ -78,9 +78,11 @@ const (
 )
 
 func extractIntervalQueryParams(context *gin.Context) (*intervalQueryParams, error) {
-	var to time.Time
-	var from time.Time
-	var err error
+	var (
+		to   time.Time
+		from time.Time
+		err  error
+	)
 
 	lbString := context.Query(fromParam)
 	if len(lbString) == 0 {
@@ -95,6 +97,7 @@ func extractIntervalQueryParams(context *gin.Context) (*intervalQueryParams, err
 
 	ubString := context.Query(toParam)
 	now := time.Now()
+
 	if len(ubString) == 0 {
 		from = now
 		log.Info(log.UsingDefaultParameterValue(toParam, from.Format(dateFormat)))
@@ -103,6 +106,7 @@ func extractIntervalQueryParams(context *gin.Context) (*intervalQueryParams, err
 		if err != nil {
 			return nil, fmt.Errorf(log.MalformedQueryParameter(toParam, err.Error()))
 		}
+
 		if from.After(now) {
 			return nil, fmt.Errorf("error during upper interval bound parsing: "+
 				"the given bound can't be in the future (current time: %v, given time:%v)", now, from)
@@ -186,6 +190,7 @@ var (
 
 func checkForInvalidQueryKeys(filters []map[string]interface{}) error {
 	var invalidQueryKeys []string
+
 	for _, filter := range filters {
 		for key := range filter {
 			if !checkIsKeyAValidAttribute(key) {
@@ -205,16 +210,19 @@ func checkIsKeyAValidAttribute(key string) bool {
 	if strings.HasPrefix(key, repo.AdditionalMetadata) {
 		return true
 	}
+
 	for _, attribute := range validAttributes {
 		if key == attribute {
 			return true
 		}
 	}
+
 	return false
 }
 
 func convertTimestamps(filters []map[string]interface{}) error {
 	invalidTimestampFields := make(map[string]error)
+
 	for _, filter := range filters {
 		for key, value := range filter {
 			if isKeyATimestampAttribute(key) {
@@ -240,6 +248,7 @@ func isKeyATimestampAttribute(key string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -250,20 +259,25 @@ func convertToTime(value interface{}) (interface{}, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse time: %w", err)
 		}
+
 		return timestamp, nil
 	case map[string]interface{}:
 		condition := make(map[string]time.Time)
+
 		for operator, timeStr := range v {
 			timeStr, ok := timeStr.(string)
 			if !ok {
 				return nil, fmt.Errorf("time for operator %s is not a string", operator)
 			}
+
 			timestamp, err := time.Parse(dateFormat, timeStr)
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse time for operator %s: %w", operator, err)
 			}
+
 			condition[operator] = timestamp
 		}
+
 		return condition, nil
 	default:
 		return nil, fmt.Errorf("invalid time format")

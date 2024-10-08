@@ -42,6 +42,7 @@ func (Mock) Get(_ context.Context, _, _ string, _ []string) ([]Message, error) {
 
 func (Mock) GetAll(_ context.Context, _ string, _ []string, _ []string) ([]Message, error) {
 	locationPosition := 1
+
 	return []Message{
 		{
 			BrokerID:             "test-topic",
@@ -76,6 +77,7 @@ func (Mock) GetAll(_ context.Context, _ string, _ []string, _ []string) ([]Messa
 
 func (Mock) GetAllInInterval(_ context.Context, _ string, _, _ time.Time, _ string, _, _ int, _ []string) ([]Message, error) {
 	locationPosition := 1
+
 	return []Message{
 		{
 			BrokerID:             "test-topic",
@@ -114,6 +116,7 @@ func (Mock) GetAllInIntervalDocumentCount(_ context.Context, _ string, _, _ time
 
 func (Mock) GetQueried(_ context.Context, _ QueryInformation) ([]Message, error) {
 	locationPosition := 1
+
 	return []Message{
 		{
 			BrokerID:             "test-topic",
