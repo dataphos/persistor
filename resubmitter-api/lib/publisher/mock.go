@@ -50,8 +50,10 @@ func (s *MockTopic) Publish(_ context.Context, record *persistor.Record) error {
 	return nil
 }
 
-type ErrorProducingPublisher struct{}
-type ErrorProducingTopic struct{}
+type (
+	ErrorProducingPublisher struct{}
+	ErrorProducingTopic     struct{}
+)
 
 func (ErrorProducingPublisher) Topic(_ string) (Topic, error) {
 	return ErrorProducingTopic{}, nil

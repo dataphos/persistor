@@ -14,8 +14,10 @@
 
 package main
 
-type storageConnectorType string
-type publisherConnectorType string
+type (
+	storageConnectorType   string
+	publisherConnectorType string
+)
 
 const (
 	storageTypeEnv   = "STORAGE_TYPE"

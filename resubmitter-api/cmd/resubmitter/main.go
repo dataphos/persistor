@@ -65,7 +65,6 @@ func initializePublisher(publisherType publisherConnectorType) (publisher.Publis
 }
 
 func main() {
-
 	storage, err := initializeStorage(storageConnectorType(os.Getenv(storageTypeEnv)))
 	if err != nil {
 		log.Error(err.Error(), 0)
@@ -86,7 +85,6 @@ func main() {
 		avro.New(),
 		pub,
 	)
-
 	if err != nil {
 		log.Error(fmt.Errorf("error during resubmitter creation: %w", err).Error(), 0)
 

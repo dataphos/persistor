@@ -393,7 +393,6 @@ func (resubmitterJob *resubmitterJob) publish(ctx context.Context, topicID strin
 	}
 
 	recordPublisher := func(record persistor.Record) {
-
 		err := topic.Publish(ctx, &record)
 		if err != nil {
 			log.Debug(err.Error(), errcodes.Publisher)
