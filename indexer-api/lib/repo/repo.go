@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package repo contains the caching, querying and mongo handling logic
 package repo
 
 import (
@@ -36,11 +37,11 @@ type Message struct {
 }
 
 type QueryParameters struct {
-	BrokerId             string `form:"broker_id"`
-	BrokerMessageId      string `form:"broker_msg_id"`
+	BrokerID             string `form:"broker_id"`
+	BrokerMessageID      string `form:"broker_msg_id"`
 	BusinessSourceKey    string `form:"business_source_key"`
 	BusinessObjectKey    string `form:"business_object_key"`
-	UniqueId             string `form:"unique_id"`
+	UniqueID             string `form:"unique_id"`
 	IndexSourceKey       string `form:"index_source_key"`
 	LocationKey          string `form:"location_key"`
 	LocationPosition     *int   `form:"location_position"`

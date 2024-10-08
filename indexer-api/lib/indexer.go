@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package indexer implements the indexer logic for Indexer-API.
 package indexer
 
 import (
@@ -45,7 +46,7 @@ type Interval struct {
 	Messages      []repo.Message `json:"messages"`
 }
 
-func (indexer *Indexer) GetAllInInterval(mongoCollection, brokerID string, from, to time.Time, limit, offset int, attributes []string) (*Interval, error) {
+func (indexer *Indexer) GetAllInInterval(mongoCollection, brokerID string, from, to time.Time, limit, offset int, attributes []string) (*Interval, error) { //nolint:varnamelen // fine length
 	messages, err := indexer.Repository.GetAllInInterval(context.Background(), mongoCollection, from, to, brokerID, limit, offset, attributes)
 	if err != nil {
 		return nil, err

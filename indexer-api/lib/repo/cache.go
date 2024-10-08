@@ -108,7 +108,7 @@ func constructDocumentCountKeyFromParams(to, from time.Time, brokerID, mongoColl
 func (cacheRepo *cached) tryGetIntervalAndBrokerIDDocumentCount(key string) (int64, bool) {
 	count, hit := cacheRepo.countCache.Get(key)
 	if hit {
-		return count.(int64), hit
+		return count.(int64), hit //nolint:forcetypeassert //fine here
 	}
 
 	return 0, hit

@@ -17,13 +17,13 @@ package log
 import "fmt"
 
 const (
-	malformedUrlQueryParameterTemplate = "error in parsing %s query parameter: %s"
+	malformedURLQueryParameterTemplate = "error in parsing %s query parameter: %s"
 	usingDefaultParameterValueTemplate = "parameter %s not provided, using default value %s instead"
 	parsingEnvVariableFailedTemplate   = "parsing env variable %s failed"
 )
 
 func MalformedQueryParameter(parameterName, additionalInformation string) string {
-	return fmt.Sprintf(malformedUrlQueryParameterTemplate, parameterName, additionalInformation)
+	return fmt.Sprintf(malformedURLQueryParameterTemplate, parameterName, additionalInformation)
 }
 
 func UsingDefaultParameterValue(parameterName, defaultValue string) string {

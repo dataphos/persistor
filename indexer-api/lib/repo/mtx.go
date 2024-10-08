@@ -81,7 +81,7 @@ func (l *lock) RUnlock(key interface{}) {
 	l.putBackInPool(key, m)
 }
 
-func (l *lock) putBackInPool(key interface{}, m *refCounter) {
+func (l *lock) putBackInPool(key interface{}, m *refCounter) { //nolint:varnamelen // ok length
 	l.lock.Lock()
 	defer l.lock.Unlock()
 	atomic.AddInt64(&m.counter, -1)
@@ -98,9 +98,9 @@ func (l *lock) getLocker(key interface{}) *refCounter {
 		lock:    l.pool.Get().(*sync.RWMutex),
 	})
 
-	return res.(*refCounter)
+	return res.(*refCounter) //nolint:forcetypeassert //fine here
 }
 func (l *lock) tryGetLocker(key interface{}) (*refCounter, bool) {
 	res, ok := l.inUse.Load(key)
-	return res.(*refCounter), ok
+	return res.(*refCounter), ok //nolint:forcetypeassert //fine here
 }

@@ -193,7 +193,7 @@ func extractIndexerMessages(response *http.Response) ([]Message, error) {
 	return messages, nil
 }
 
-func (indexer *indexer) GetAllInInterval(mongoCollection, brokerID string, from, to time.Time, limit, offset int) (*IntervalQueryResponse, error) {
+func (indexer *indexer) GetAllInInterval(mongoCollection, brokerID string, from, to time.Time, limit, offset int) (*IntervalQueryResponse, error) { //nolint:varnamelen // fine length
 	url := indexer.constructGetByIntervalAndBrokerIDURL(mongoCollection, brokerID, from, to, limit, offset)
 	log.Debug(fmt.Sprintf("sending request to Indexer API on %s", url), 0)
 

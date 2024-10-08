@@ -30,12 +30,14 @@ func init() {
 	if err != nil {
 		log.Fatal(err.Error(), 0)
 	}
+
 	repository = mongo
 
 	cached, err := repo.WithLocalCache(repository, repo.WithSize(100))
 	if err != nil {
 		log.Fatal(err.Error(), 0)
 	}
+
 	repository = cached
 
 	handler = indexer.NewHandler(indexer.New(repository))

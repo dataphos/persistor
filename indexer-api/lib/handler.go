@@ -31,7 +31,7 @@ func NewHandler(indexer *Indexer) *Handler {
 	return &Handler{indexer: indexer}
 }
 
-// GetUnique gets the metadata with the unique id supplied in the URL
+// GetUnique gets the metadata with the unique id supplied in the URL.
 func (handler *Handler) GetUnique(context *gin.Context) {
 	id := context.Param("id")
 	mongoCollection := context.Param("mongo_collection")
@@ -53,9 +53,10 @@ type GetAllRequestBody struct {
 	Ids []string `json:"ids" binding:"required"`
 }
 
-// GetAll gets the metadata with the unique ids supplied in the request body
+// GetAll gets the metadata with the unique ids supplied in the request body.
 func (handler *Handler) GetAll(context *gin.Context) {
 	var body GetAllRequestBody
+
 	mongoCollection := context.Param("mongo_collection")
 
 	err := context.BindJSON(&body)
@@ -96,6 +97,7 @@ func (handler *Handler) GetAllInInterval(context *gin.Context) {
 
 		return
 	}
+
 	paginationParams := extractPaginationQueryParams(context)
 
 	metadata, err := handler.indexer.GetAllInInterval(mongoCollection, brokerID, intervalParams.to, intervalParams.from, paginationParams.limit, paginationParams.offset, intervalRequest)
@@ -118,9 +120,9 @@ type GetQueriedRequestBody struct {
 // GetQueried gets all messages which contain metadata values given as query parameters.
 // Because this operation can produce a multitude of messages, pagination is also implemented through URL params.
 func (handler *Handler) GetQueried(context *gin.Context) {
-	mongoCollection := context.Param("mongo_collection")
-
 	var body GetQueriedRequestBody
+
+	mongoCollection := context.Param("mongo_collection")
 
 	err := context.BindJSON(&body)
 	if err != nil {

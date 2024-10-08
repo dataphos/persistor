@@ -79,7 +79,7 @@ const (
 
 func extractIntervalQueryParams(context *gin.Context) (*intervalQueryParams, error) {
 	var (
-		to   time.Time
+		to   time.Time //nolint:varnamelen // fine length
 		from time.Time
 		err  error
 	)
@@ -122,11 +122,11 @@ func extractIntervalQueryParams(context *gin.Context) (*intervalQueryParams, err
 
 var (
 	validAttributes = []string{
-		repo.BrokerId,
-		repo.BrokerMessageId,
+		repo.BrokerID,
+		repo.BrokerMessageID,
 		repo.BusinessSourceKey,
 		repo.BusinessObjectKey,
-		repo.UniqueId,
+		repo.UniqueID,
 		repo.IndexSourceKey,
 		repo.OrderingKey,
 		repo.AdditionalMetadata,
@@ -145,11 +145,11 @@ var (
 	}
 
 	uniqueRequestAttributes = []string{
-		repo.BrokerId,
-		repo.BrokerMessageId,
+		repo.BrokerID,
+		repo.BrokerMessageID,
 		repo.BusinessSourceKey,
 		repo.BusinessObjectKey,
-		repo.UniqueId,
+		repo.UniqueID,
 		repo.IndexSourceKey,
 		repo.OrderingKey,
 		repo.AdditionalMetadata,
@@ -162,11 +162,11 @@ var (
 	}
 
 	intervalRequest = []string{
-		repo.BrokerId,
-		repo.BrokerMessageId,
+		repo.BrokerID,
+		repo.BrokerMessageID,
 		repo.BusinessSourceKey,
 		repo.BusinessObjectKey,
-		repo.UniqueId,
+		repo.UniqueID,
 		repo.OrderingKey,
 		repo.AdditionalMetadata,
 		repo.LocationKey,
@@ -175,11 +175,11 @@ var (
 	}
 
 	queryRequest = []string{
-		repo.BrokerId,
-		repo.BrokerMessageId,
+		repo.BrokerID,
+		repo.BrokerMessageID,
 		repo.BusinessSourceKey,
 		repo.BusinessObjectKey,
-		repo.UniqueId,
+		repo.UniqueID,
 		repo.OrderingKey,
 		repo.AdditionalMetadata,
 		repo.LocationKey,
@@ -230,6 +230,7 @@ func convertTimestamps(filters []map[string]interface{}) error {
 				if err != nil {
 					invalidTimestampFields[key] = err
 				}
+
 				filter[key] = timestamp
 			}
 		}
@@ -253,9 +254,9 @@ func isKeyATimestampAttribute(key string) bool {
 }
 
 func convertToTime(value interface{}) (interface{}, error) {
-	switch v := value.(type) {
+	switch valueType := value.(type) {
 	case string:
-		timestamp, err := time.Parse(dateFormat, v)
+		timestamp, err := time.Parse(dateFormat, valueType)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse time: %w", err)
 		}
@@ -264,7 +265,7 @@ func convertToTime(value interface{}) (interface{}, error) {
 	case map[string]interface{}:
 		condition := make(map[string]time.Time)
 
-		for operator, timeStr := range v {
+		for operator, timeStr := range valueType {
 			timeStr, ok := timeStr.(string)
 			if !ok {
 				return nil, fmt.Errorf("time for operator %s is not a string", operator)

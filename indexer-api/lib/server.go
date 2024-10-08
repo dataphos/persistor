@@ -128,7 +128,7 @@ func Serve(handler *Handler, opts ...ServerOption) {
 
 	go startServer(srv, config)
 
-	// Wait for interrupt signal to gracefully shut down the server
+	// Wait for interrupt signal to gracefully shut down the server.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

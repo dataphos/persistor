@@ -26,11 +26,11 @@ func CalculateMessageSize(data []byte, attributes map[string]interface{}) int {
 		messageSize += len(key)
 
 		// Add the size of the value.
-		switch v := value.(type) {
+		switch valueType := value.(type) {
 		case []byte:
-			messageSize += len(v)
+			messageSize += len(valueType)
 		case string:
-			messageSize += len(v)
+			messageSize += len(valueType)
 		}
 	}
 
