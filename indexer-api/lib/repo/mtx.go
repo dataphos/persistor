@@ -103,5 +103,6 @@ func (l *lock) getLocker(key interface{}) *refCounter {
 
 func (l *lock) tryGetLocker(key interface{}) (*refCounter, bool) {
 	res, ok := l.inUse.Load(key)
+
 	return res.(*refCounter), ok //nolint:forcetypeassert //fine here
 }

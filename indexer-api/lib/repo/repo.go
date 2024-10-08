@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package repo contains the caching, querying and mongo handling logic
+// Package repo contains the caching, querying and mongo handling logic.
 package repo
 
 import (

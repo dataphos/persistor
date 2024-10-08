@@ -77,7 +77,7 @@ func (cacheRepo *cached) GetAllInInterval(ctx context.Context, mongoCollection s
 }
 
 // GetAllInIntervalDocumentCount returns the count of documents that would be returned by the GetAllInInterval.
-func (cacheRepo *cached) GetAllInIntervalDocumentCount(ctx context.Context, mongoCollection string, to, from time.Time, brokerID string) (int64, error) {
+func (cacheRepo *cached) GetAllInIntervalDocumentCount(ctx context.Context, mongoCollection string, to, from time.Time, brokerID string) (int64, error) { //nolint:varnamelen // fine length
 	key := constructDocumentCountKeyFromParams(to, from, brokerID, mongoCollection)
 
 	cacheRepo.mtx.RLock(key)

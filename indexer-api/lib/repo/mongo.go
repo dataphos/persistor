@@ -109,6 +109,7 @@ func (repo *repo) Get(ctx context.Context, mongoCollection, id string, attribute
 	}
 
 	var messages []Message
+
 	err = cursor.All(ctx, &messages)
 	if err != nil {
 		return nil, err
